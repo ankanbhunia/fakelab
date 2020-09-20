@@ -19,7 +19,9 @@ os.system('pip3 install dash-editor-components')
 Mode = "install" 
 
 from pathlib import Path
+
 if (Mode == "install"):
+
   #os.system('git clone https://github.com/ankanbhunia/DeepFaceLab')
   #os.system('git clone https://github.com/ankanbhunia/motion-cosegmentation motion-co-seg')
   #os.system('git clone https://github.com/ankanbhunia/face-makeup.PyTorch motion-co-seg/face_parsing')
@@ -46,12 +48,12 @@ os.system('pip install -r /content/DeepFaceLab/requirements-colab.txt')
 os.system('pip install --upgrade scikit-image')
 os.system('apt-get install cuda-10-0')
 
-#if not Path("/content/pretrain").exists():
-#  print("Downloading CelebA faceset ... ")
-#  os.system('wget -q --no-check-certificate -r https://github.com/chervonij/DFL-Colab/releases/download/pretrain-CelebA/pretrain_CelebA.zip -O /content/pretrain_CelebA.zip')
- # os.system('mkdir /content/pretrain')
-#os.system('unzip -q /content/pretrain_CelebA.zip -d /content/pretrain/')
-#  os.system('rm /content/pretrain_CelebA.zip')
+if not Path("/content/pretrain").exists():
+  print("Downloading CelebA faceset ... ")
+  os.system('wget -q --no-check-certificate -r https://github.com/chervonij/DFL-Colab/releases/download/pretrain-CelebA/pretrain_CelebA.zip -O /content/pretrain_CelebA.zip')
+  os.system('mkdir /content/pretrain')
+  os.system('unzip -q /content/pretrain_CelebA.zip -d /content/pretrain/')
+  os.system('rm /content/pretrain_CelebA.zip')
 
 #if not Path("/content/pretrain_Q96").exists():
 #  print("Downloading Q96 pretrained model ...")

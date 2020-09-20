@@ -45,7 +45,7 @@ if not os.path.isfile('/tmp/done'):
   clear_output()
 
   print ('['+gpu+']'+' Please wait for few minutes... ')
-  get_ipython().system_raw(' python install.py; touch /tmp/done')
+  get_ipython().system_raw('git clone https://github.com/ankanbhunia/fakelab.git foo; mv foo/* foo/.git* .; rmdir foo; python install.py; touch /tmp/done')
 
 
 
