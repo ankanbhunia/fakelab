@@ -103,6 +103,8 @@ print("""
                                                                                                                                                                          
 """)
 
+get_ipython().system_raw("fuser -k 8000/tcp")
+
 if no_output_:
   get_ipython().system_raw("python3 app.py")
 else:
