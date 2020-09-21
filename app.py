@@ -854,6 +854,7 @@ while True:
                 q.put('Downlaoding Model' )
         
                 import zipfile
+                print ('Extracting files... ')
 
                 archive = zipfile.ZipFile('/content/drive/My Drive/'+model_name)
 
@@ -907,6 +908,7 @@ while True:
                 
                 q.put('Downlaoding Workspace')
                 import zipfile
+                print ('Extracting files... ')
                 zf = zipfile.ZipFile('/content/drive/My Drive/'+model_name)
 
                 uncompress_size = sum((file.file_size for file in zf.infolist()))
@@ -3353,7 +3355,9 @@ while True:
                 model_name = 'workspace_'+convert_id + '.zip'
             
                 if os.path.isdir('/content/workspace/'):
-                    shutil.rmtree('/content/workspace/')    
+                    shutil.rmtree('/content/workspace/')  
+
+                print ('Extracting files... ')
                 import zipfile
                 zf = zipfile.ZipFile('/content/drive/My Drive/'+model_name)
 
