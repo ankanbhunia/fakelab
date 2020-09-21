@@ -1390,29 +1390,7 @@ while True:
             dcc.Loading(html.Div(id = 'test_div'), type = 'dot'),
             
             #dcc.Loading(html.Div('  ', id = 'test_div'), type = 'circle'),
-            dbc.CardBody( 
-                
-                dbc.InputGroup(
-                    [
-                    
-                    #dbc.Button(outline=True, id = 'mask_mode', active=False, disabled = convert_disabled, color="primary", className="fas fa-theater-masks"),
-                    #dbc.Button(outline=True, id = 'mode', active=False, disabled = convert_disabled, color="primary", className="fas fa-cogs"),
-                    #dbc.Button(outline=True, id = 'scale_face', active=False, disabled = convert_disabled, color="primary", className="fas fa-arrows-alt"),
-
-                    #dbc.Button(outline=True, id = 'erode_mask_modifier', active=False, disabled = convert_disabled, color="primary", className="fas fa-crop-alt"),
-                    #dbc.Button(outline=True, id = 'color_mode', active=False, disabled = convert_disabled, color="primary", className="fas fa-palette"),
-                    #dbc.Button(outline=True, id = 'adv_settings', active=False, disabled = convert_disabled, color="primary", className="fas fa-sliders-h"),
-                  
-                    dbc.Row([dbc.Col(size_layout), dbc.Col(shift_layout)]),
-                    
-                    ], 
-                  
-                ),
-              
-                
-
             
-            ),
             
             
         dbc.Tooltip('Choose Workspace', target="convert_model_continue"),
@@ -1420,57 +1398,6 @@ while True:
         dbc.Tooltip('Convert', target="okay_merge"),
 
         
-        ],
-        style={"width": "25rem"}, 
-    ),
-
-
-
-
-
-
-
-
-
-
-
-
-    dbc.Toast([
-    
-    dbc.InputGroup([dbc.InputGroupAddon("Face type", addon_type="prepend"),dbc.Select(id = 'face_type_', options = [{'label':'Head', "value" :0},
-    {'label':'Face', "value" :1}, 
-    {'label':'Full Face', "value" :2}, 
-    ], value = '0')], size="sm"),
-    
-    dbc.InputGroup([dbc.InputGroupAddon("Mask type", addon_type="prepend"),dbc.Select(id = 'mask_mode_', options = [{'label':'dst', "value" :1},
-    {'label':'learned-prd', "value" :2}, 
-    {'label':'learned-dst', "value" :3}, 
-    {'label':'learned-prd*learned-dst', "value" :4}, 
-    {'label':'learned-prd+learned-dst', "value" :5},  
-    {'label':'XSeg-prd', "value" :6}, 
-    {'label':'XSeg-dst', "value" :7},  
-    {'label':'XSeg-prd*XSeg-dst', "value" :8}, 
-    {'label':'learned-prd*learned-dst*XSeg-prd*XSeg-dst', "value" :9}], value = 3),], size="sm",),
-    
-    dbc.InputGroup([dbc.InputGroupAddon("Mode", addon_type="prepend"),dbc.Select(id = 'mode_', options = [{'label':'original', "value" :'original'},
-    {'label':'overlay', "value" :'overlay'}, 
-    {'label':'hist-match', "value" :'hist-match'}, 
-    {'label':'seamless', "value" :'seamless'}, 
-    {'label':'seamless-hist-match', "value" :'seamless-hist-match'},  
-    {'label':'raw-rgb', "value" :'raw-rgb'}, 
-    {'label':'raw-predict', "value" :'raw-predict'}], value = 'overlay') ], size="sm",)
-    
-    ,dbc.InputGroup([dbc.InputGroupAddon("Color mode", addon_type="prepend"),dbc.Select(id = 'color_mode_', options = [{'label':'None', "value" :0},
-    {'label':'rct', "value" :1}, 
-    {'label':'lct', "value" :2}, 
-    {'label':'mkl', "value" :3}, 
-    {'label':'mkl-m', "value" :4},  
-    {'label':'idt', "value" :5}, 
-    {'label':'idt-m', "value" :6},  
-    {'label':'sot-m', "value" :7}, 
-    {'label':'mix-m', "value" :8}], value = '0')], size="sm"),
-    
-    
     dbc.Card(
         dbc.CardBody([dcc.Slider(
       min=0,
@@ -1524,8 +1451,81 @@ while True:
       step=1,
       id = "color_degrade_power_",  marks = {0: '0', 100:'100', 50: 'Color Degrade Power'}
     )])),
+        ],
+        style={"width": "800px"}, 
+    ),
+
+
+
+
+
+
+
+
+
+
+
+
+    dbc.Toast([
     
-], id="Settings_toggle_",header="Advanced Settings",is_open=True,icon="primary",dismissable=False, style={"maxWidth": "400px"})]),
+    dbc.InputGroup([dbc.InputGroupAddon("Face type", addon_type="prepend"),dbc.Select(id = 'face_type_', options = [{'label':'Head', "value" :0},
+    {'label':'Face', "value" :1}, 
+    {'label':'Full Face', "value" :2}, 
+    ], value = '0')], size="sm"),
+    
+    dbc.InputGroup([dbc.InputGroupAddon("Mask type", addon_type="prepend"),dbc.Select(id = 'mask_mode_', options = [{'label':'dst', "value" :1},
+    {'label':'learned-prd', "value" :2}, 
+    {'label':'learned-dst', "value" :3}, 
+    {'label':'learned-prd*learned-dst', "value" :4}, 
+    {'label':'learned-prd+learned-dst', "value" :5},  
+    {'label':'XSeg-prd', "value" :6}, 
+    {'label':'XSeg-dst', "value" :7},  
+    {'label':'XSeg-prd*XSeg-dst', "value" :8}, 
+    {'label':'learned-prd*learned-dst*XSeg-prd*XSeg-dst', "value" :9}], value = 3),], size="sm",),
+    
+    dbc.InputGroup([dbc.InputGroupAddon("Mode", addon_type="prepend"),dbc.Select(id = 'mode_', options = [{'label':'original', "value" :'original'},
+    {'label':'overlay', "value" :'overlay'}, 
+    {'label':'hist-match', "value" :'hist-match'}, 
+    {'label':'seamless', "value" :'seamless'}, 
+    {'label':'seamless-hist-match', "value" :'seamless-hist-match'},  
+    {'label':'raw-rgb', "value" :'raw-rgb'}, 
+    {'label':'raw-predict', "value" :'raw-predict'}], value = 'overlay') ], size="sm",)
+    
+    ,dbc.InputGroup([dbc.InputGroupAddon("Color mode", addon_type="prepend"),dbc.Select(id = 'color_mode_', options = [{'label':'None', "value" :0},
+    {'label':'rct', "value" :1}, 
+    {'label':'lct', "value" :2}, 
+    {'label':'mkl', "value" :3}, 
+    {'label':'mkl-m', "value" :4},  
+    {'label':'idt', "value" :5}, 
+    {'label':'idt-m', "value" :6},  
+    {'label':'sot-m', "value" :7}, 
+    {'label':'mix-m', "value" :8}], value = '0')], size="sm"),
+dbc.CardBody( 
+                
+                dbc.InputGroup(
+                    [
+                    
+                    #dbc.Button(outline=True, id = 'mask_mode', active=False, disabled = convert_disabled, color="primary", className="fas fa-theater-masks"),
+                    #dbc.Button(outline=True, id = 'mode', active=False, disabled = convert_disabled, color="primary", className="fas fa-cogs"),
+                    #dbc.Button(outline=True, id = 'scale_face', active=False, disabled = convert_disabled, color="primary", className="fas fa-arrows-alt"),
+
+                    #dbc.Button(outline=True, id = 'erode_mask_modifier', active=False, disabled = convert_disabled, color="primary", className="fas fa-crop-alt"),
+                    #dbc.Button(outline=True, id = 'color_mode', active=False, disabled = convert_disabled, color="primary", className="fas fa-palette"),
+                    #dbc.Button(outline=True, id = 'adv_settings', active=False, disabled = convert_disabled, color="primary", className="fas fa-sliders-h"),
+                  
+                    dbc.Row([size_layout, shift_layout]),
+                    
+                    ], 
+                  
+                ),
+              
+                
+
+            
+            ),
+    
+    
+], id="Settings_toggle_",header="Advanced Settings",is_open=True,icon="primary",dismissable=False, style={"maxWidth": "200px"})]),
     
    
 
@@ -3534,7 +3534,7 @@ while True:
                    
                    
             result, _ = Merger_tune.MergeMaskedFace_test(npy_, cfg_merge)
-            result = imutils.resize(result*255, height=156)
+            result = imutils.resize(result*255, height=512)
             
             #########print (result.shape)
             
