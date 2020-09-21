@@ -463,16 +463,16 @@ while True:
 
                 
                 
-                q.put  ('Enhancing Faces ')
+                #q.put  ('Enhancing Faces ')
                 
-                p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_src/aligned", shell=True),
-                    subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_dst/aligned", shell=True)]
+                #p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_src/aligned", shell=True),
+                #    subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_dst/aligned", shell=True)]
 
-                p_ = [p[0].wait(), p[1].wait()]
+                #p_ = [p[0].wait(), p[1].wait()]
                 
-                if p_[0] != 0 and p_[1]!= 0: 
-                    q.put('Error while Enhancing faces! ')
-                    return False    
+                #if p_[0] != 0 and p_[1]!= 0: 
+                #    q.put('Error while Enhancing faces! ')
+                #    return False    
                 
                                
                 
@@ -627,16 +627,16 @@ while True:
 
                     
                     
-                    q.put  ('Enhancing Faces ')
-                    
-                    p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_src/aligned", shell=True),
-                        subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_dst/aligned", shell=True)]
+                    #q.put  ('Enhancing Faces ')
+                
+                    #p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_src/aligned", shell=True),
+                    #    subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_dst/aligned", shell=True)]
 
-                    p_ = [p[0].wait(), p[1].wait()]
+                    #p_ = [p[0].wait(), p[1].wait()]
                     
-                    if p_[0] != 0 and p_[1]!= 0: 
-                        q.put('Error while Enhancing faces! ')
-                        return False    
+                    #if p_[0] != 0 and p_[1]!= 0: 
+                    #    q.put('Error while Enhancing faces! ')
+                    #    return False 
                     
                                    
                     
@@ -781,16 +781,16 @@ while True:
 
                         
                         
-                        q.put  ('Enhancing Faces ')
-                        
-                        p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_src/aligned", shell=True),
-                            subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_dst/aligned", shell=True)]
+                        #q.put  ('Enhancing Faces ')
+                
+                        #p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_src/aligned", shell=True),
+                        #    subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_dst/aligned", shell=True)]
 
-                        p_ = [p[0].wait(), p[1].wait()]
+                        #p_ = [p[0].wait(), p[1].wait()]
                         
-                        if p_[0] != 0 and p_[1]!= 0: 
-                            q.put('Error while Enhancing faces! ')
-                            return False    
+                        #if p_[0] != 0 and p_[1]!= 0: 
+                        #    q.put('Error while Enhancing faces! ')
+                        #    return False    
                         
                                        
                         
@@ -3605,11 +3605,12 @@ while True:
             
             done =  int((number_of_files/total_number_of_files)*100)
         
-        
+            print ('/content/drive/My Drive/result_' + convert_id + '.mp4')
+            
             if os.path.isfile('/content/drive/My Drive/result_' + convert_id + '.mp4'):
 
-                time.sleep(10)
-            
+                #time.sleep(10)
+                print ('tgb')
                 fid = getoutput("xattr -p 'user.drive.id' '/content/drive/My Drive/result_'"+convert_id+"'.mp4'")
                 url = 'https://docs.google.com/file/d/'+fid
 
