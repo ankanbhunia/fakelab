@@ -24,6 +24,7 @@ clear_output()
 ipy = get_ipython()
 ipy.magic("tensorflow_version 1.x")
 
+clear_output()
 import tensorflow as tf
 
 if not tf.test.is_gpu_available():
@@ -37,6 +38,25 @@ try:
   gpu = GPU[0]
 except:
   gpu = 'CPU'
+
+print ("""
+
+
+  .-.            ___               ___         ___      
+ /    \         (   )             (   )       (   )     
+ | .`. ;  .---.  | |   ___   .--.  | |   .---. | |.-.   
+ | |(___)/ .-, \ | |  (   ) /    \ | |  / .-, \| /   \  
+ | |_   (__) ; | | |  ' /  |  .-. ;| | (__) ; ||  .-. | 
+(   __)   .'`  | | |,' /   |  | | || |   .'`  || |  | | 
+ | |     / .'| | | .  '.   |  |/  || |  / .'| || |  | | 
+ | |    | /  | | | | `. \  |  ' _.'| | | /  | || |  | | 
+ | |    ; |  ; | | |   \ \ |  .'.-.| | ; |  ; || '  | | 
+ | |    ' `-'  | | |    \ .'  `-' /| | ' `-'  |' `-' ;  
+(___)   `.__.'_.(___ ) (___)`.__.'(___)`.__.'_. `.__.   
+ 
+ 
+"""
+)
 
 if not os.path.isfile('/tmp/done'):
   if not os.path.isdir('/content/drive/'):

@@ -15,7 +15,7 @@ os.system('pip3 install mhyt')
 os.system('pip3 install dash_daq')
 os.system('pip3 install dash-editor-components')
 #os.system('pip3 install scipy==1.1.0')
-
+os.system('sudo apt-get install -y xattr')
 Mode = "install" 
 
 from pathlib import Path
