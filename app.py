@@ -1324,6 +1324,11 @@ while True:
                 dbc.Row([dbc.Col(dbc.Button(outline=True, id = 'h_minus_size', active=False, disabled = convert_disabled, color="success", className="fas fa-minus-circle")),  dbc.Col(dbc.Button(outline=True, id = 'h_plus_size', active=False, disabled = convert_disabled, color="success", className="fas fa-plus-circle"))]),
           
                 dbc.Row(dbc.Button(outline=True, id = 'v_minus_size', active=False, disabled = convert_disabled, color="success", className="fas fa-minus-circle"), justify="center"),
+                
+                dbc.Tooltip('Stretch face vertically', target="v_plus_size"),
+                dbc.Tooltip('Shrink face horizontally', target="h_minus_size"),
+                dbc.Tooltip('Stretch face horizontally', target="h_plus_size"),
+                dbc.Tooltip('Shrink face vertically', target="v_minus_size"),
             ]
         ),
         style={"width": "10rem"},
@@ -1342,6 +1347,11 @@ while True:
                 dbc.Row([dbc.Col(dbc.Button(outline=True, id = 'h_minus_shift', active=False, disabled = convert_disabled, color="success", className="fas fa-chevron-circle-left")),  dbc.Col(dbc.Button(outline=True, id = 'h_plus_shift', active=False, disabled = convert_disabled, color="success", className="fas fa-chevron-circle-right"))]),
           
                 dbc.Row(dbc.Button(outline=True, id = 'v_minus_shift', active=False, disabled = convert_disabled, color="success", className="fas fa-chevron-circle-down"), justify="center"),
+                
+                dbc.Tooltip('move face upward', target="v_plus_shift"),
+                dbc.Tooltip('move face to the left', target="h_minus_shift"),
+                dbc.Tooltip('move face to the right', target="h_plus_shift"),
+                dbc.Tooltip('move face downward', target="v_minus_shift"),
             ]
         ),
         style={"width": "10rem"},
@@ -1401,6 +1411,13 @@ while True:
 
             
             ),
+            
+            
+        dbc.Tooltip('Choose Workspace', target="convert_model_continue"),
+        dbc.Tooltip('Refresh Preview Image', target="refresh_img"),
+        dbc.Tooltip('Convert', target="okay_merge"),
+
+        
         ],
         style={"width": "25rem"}, 
     ),
@@ -3409,7 +3426,7 @@ while True:
                    
     def update_convert_image(v_plus_size,h_minus_size, h_plus_size, v_minus_size , v_plus_shift, h_minus_shift, h_plus_shift, v_minus_shift,
                             refresh_img, mask_mode_, face_type_, mode_, Erode_,Blur_ ,color_mode_, motion_blur_power_, blursharpen_amount_,
-                            image_denoise_power_,color_degrade_power_, stp_size, stp_shift, trigger):
+                            image_denoise_power_,color_degrade_power_, trigger,stp_size, stp_shift):
 
         
         trigger_id = dash.callback_context.triggered[0]['prop_id']
@@ -3441,7 +3458,6 @@ while True:
         if trigger_id == 'h_plus_size.n_clicks':
         
             horizontal_shear = horizontal_shear + stp_size
-            
             
             
         if trigger_id == 'v_plus_shift.n_clicks':
@@ -3605,17 +3621,25 @@ while True:
             
             done =  int((number_of_files/total_number_of_files)*100)
         
-            print ('/content/drive/My Drive/result_' + convert_id + '.mp4')
+            #print ('/content/drive/My Drive/result_' + convert_id + '.mp4')
             
             if os.path.isfile('/content/drive/My Drive/result_' + convert_id + '.mp4'):
 
                 #time.sleep(10)
-                print ('tgb')
+                #print ('tgb')
                 fid = getoutput("xattr -p 'user.drive.id' '/content/drive/My Drive/result_'"+convert_id+"'.mp4'")
-                url = 'https://docs.google.com/file/d/'+fid
+                
+                if len(fid)>30:
+                
+                    url = 'https://docs.google.com/file/d/'+fid
 
             
-                done_ = [html.Br(), "Completed. ", html.A('Download here', href = url)]
+                    done_ = [html.Br(), "Completed. ", html.A('Download here', href = url)]
+                    done = 100
+                    
+                else:
+                
+                    done_ =  [html.Br(), "Converting frames ", dbc.Spinner(size="sm")]  
             
             else:
                 done_ =  [html.Br(), "Converting frames ", dbc.Spinner(size="sm")]   
