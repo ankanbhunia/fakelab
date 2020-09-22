@@ -3378,7 +3378,7 @@ dbc.CardBody(
 
                 print ('Extracting files... ')
                 import zipfile
-                zf = zipfile.ZipFile(os.path.join(drive_path_+model_name))
+                zf = zipfile.ZipFile(os.path.join(drive_path_,model_name))
 
                 uncompress_size = sum((file.file_size for file in zf.infolist()))
 
