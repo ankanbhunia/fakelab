@@ -1,4 +1,5 @@
 while True:
+
     from IPython.display import clear_output
     import zipfile
     import tqdm
@@ -28,6 +29,7 @@ while True:
     import sys
     import queue
     from subprocess import getoutput
+    from IPython.display import HTML
     from IPython.display import HTML
     from google.colab import drive
     import random
@@ -80,6 +82,23 @@ while True:
     global dst_face_list
     dst_face_list = []
     
+    import argparse
+
+    parser = argparse.ArgumentParser(description='FakeLab Options')
+
+    parser.add_argument('drivepath', type=str, nargs='?',
+                        help='Enter ngrok Authtoken from https://dashboard.ngrok.com/auth/your-authtoken ')
+
+    
+
+    argss = parser.parse_args()
+    if argss.drivepath == None:
+        argss.drivepath = '/content/drive/My Drive/'
+    drive_path_ = argss.drivepath
+    drive_path = '\ '.join(drive_path_.split(' '))
+    
+
+    
     class merging_vars:
 
       def __init__(self, 
@@ -126,7 +145,7 @@ while True:
         self.horizontal_shift = horizontal_shift
         self.vertical_shift = vertical_shift
 
-        
+    [os.remove(os.path.join('/tmp',i)) for i in os.listdir('/tmp') if i.endswith('.npy')]
     
     def shutdown():
         func = request.environ.get('werkzeug.server.shutdown')
@@ -316,7 +335,7 @@ while True:
 
         os.system('echo | python DeepFaceLab/main.py merge --input-dir workspace/data_dst --output-dir workspace/data_dst/merged --output-mask-dir workspace/data_dst/merged_mask --aligned-dir workspace/data_dst/aligned --model-dir workspace/model --model SAEHD')
         os.system('echo | python DeepFaceLab/main.py videoed video-from-sequence --input-dir workspace/data_dst/merged --output-file workspace/'+output_name+' --reference-file workspace/data_dst.mp4 --include-audio')
-        os.system('cp /content/workspace/'+output_name+' /content/drive/My\ Drive/')
+        os.system('cp /content/workspace/'+output_name+' '+drive_path)
         # need to install xattr
         
         ##########print ('###############################' + 'convertion done')
@@ -327,7 +346,7 @@ while True:
     def save_workspace_data():
 
       os.system('zip -r -q workspace_'+convert_id+'.zip workspace'); 
-      os.system('cp /content/workspace_'+convert_id+'.zip /content/drive/My\ Drive/')
+      os.system('cp /content/workspace_'+convert_id+'.zip '+drive_path)
       ##########print ('###############################' + 'save_workspace_data')
 
     def save_workspace_model():
@@ -336,7 +355,7 @@ while True:
 
         time.sleep(3600*2)
 
-        os.system('zip -ur workspace_'+convert_id+'.zip workspace/model'); os.system('cp /content/workspace_'+convert_id+'.zip /content/drive/My\ Drive/')
+        os.system('zip -ur workspace_'+convert_id+'.zip workspace/model'); os.system('cp /content/workspace_'+convert_id+'.zip '+drive_path)
         ##########print ('###############################' + 'save_workspace_model')
 
 
@@ -856,7 +875,7 @@ while True:
                 import zipfile
                 print ('Extracting files... ')
 
-                archive = zipfile.ZipFile('/content/drive/My Drive/'+model_name)
+                archive = zipfile.ZipFile(os.path.join(drive_path_,model_name))
 
                 for file in archive.namelist():
                     if file.startswith('workspace/model/'):
@@ -909,7 +928,7 @@ while True:
                 q.put('Downlaoding Workspace')
                 import zipfile
                 print ('Extracting files... ')
-                zf = zipfile.ZipFile('/content/drive/My Drive/'+model_name)
+                zf = zipfile.ZipFile(os.path.join(drive_path_,model_name))
 
                 uncompress_size = sum((file.file_size for file in zf.infolist()))
 
@@ -1072,9 +1091,9 @@ while True:
     global option_  
     option_ = [{"label": '(1) New Workspace', "value" : 0}, {"label": '(2) Resume Workspace', "value" : 1}, {"label": '(3) Load Workspace', "value" : 2, 'disabled': True}]
 
-    for j,idx in enumerate([i for i in os.listdir('/content/drive/My Drive') if i.startswith('workspace')]):
+    for j,idx in enumerate([i for i in os.listdir(drive_path_) if i.startswith('workspace')]):
 
-        option_.append({"label": ' ' + idx + ' [' + str(os.path.getsize('/content/drive/My Drive/'+idx) >> 20) +' MB]', "value" : j+3} )
+        option_.append({"label": ' ' + idx + ' [' + str(os.path.getsize(os.path.join(drive_path_,idx)) >> 20) +' MB]', "value" : j+3} )
 
 
     Progress =  html.Div([dbc.InputGroup(
@@ -1362,9 +1381,9 @@ while True:
     global option_convert  
     option_convert = [{"label": '(1) Current Workspace', "value" : 0}, {"label": '(2) Load Workspace', "value" : 1, 'disabled': True}]
 
-    for j,idx in enumerate([i for i in os.listdir('/content/drive/My Drive') if i.startswith('workspace')]):
+    for j,idx in enumerate([i for i in os.listdir(drive_path_) if i.startswith('workspace')]):
 
-        option_convert.append({"label": ' ' + idx + ' [' + str(os.path.getsize('/content/drive/My Drive/'+idx) >> 20) +' MB]', "value" : j+2} )
+        option_convert.append({"label": ' ' + idx + ' [' + str(os.path.getsize(os.path.join(drive_path_,idx)) >> 20) +' MB]', "value" : j+2} )
 
 
 
@@ -3359,7 +3378,7 @@ dbc.CardBody(
 
                 print ('Extracting files... ')
                 import zipfile
-                zf = zipfile.ZipFile('/content/drive/My Drive/'+model_name)
+                zf = zipfile.ZipFile(os.path.join(drive_path_+model_name))
 
                 uncompress_size = sum((file.file_size for file in zf.infolist()))
 
@@ -3622,16 +3641,17 @@ dbc.CardBody(
             
             number_of_files = len(os.listdir('/content/workspace/data_dst/merged'))
             total_number_of_files = len(os.listdir('/content/workspace/data_dst/'))-2 
+            total_number_of_files = len(os.listdir('/content/workspace/data_dst/'))-2 
             
             done =  int((number_of_files/total_number_of_files)*100)
         
             #print ('/content/drive/My Drive/result_' + convert_id + '.mp4')
             
-            if os.path.isfile('/content/drive/My Drive/result_' + convert_id + '.mp4'):
+            if os.path.isfile(os.path.join(drive_path_,'result_' + convert_id + '.mp4')):
 
                 #time.sleep(10)
                 #print ('tgb')
-                fid = getoutput("xattr -p 'user.drive.id' '/content/drive/My Drive/result_'"+convert_id+"'.mp4'")
+                fid = getoutput("xattr -p 'user.drive.id' '"+drive_path_+"'result_'"+convert_id+"'.mp4'")
                 
                 if len(fid)>30:
                 

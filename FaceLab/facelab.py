@@ -10,12 +10,16 @@ parser = argparse.ArgumentParser(description='FakeLab Options')
 parser.add_argument('ngrok_auth_token', type=str, nargs='?',
                     help='Enter ngrok Authtoken from https://dashboard.ngrok.com/auth/your-authtoken ')
 
+parser.add_argument('--path', type=str,
+                    help='Specify drive path')
+                    
 parser.add_argument('--no_output', action='store_true',
                     help='the shell output will be disabled')
 
 args = parser.parse_args()
 
 xxx = args.ngrok_auth_token
+drive_path = args.path
 no_output_ = args.no_output
 
 
@@ -114,7 +118,15 @@ print("""
 
 get_ipython().system_raw("fuser -k 8000/tcp")
 
-if no_output_:
-  get_ipython().system_raw("python3 app.py")
+if drive_path:
+
+    if no_output_:
+      get_ipython().system_raw("python3 app.py "+drive_path)
+    else:
+      G = get_ipython().getoutput("python3 app.py "+drive_path)
 else:
-  G = get_ipython().getoutput("python3 app.py")
+
+    if no_output_:
+      get_ipython().system_raw("python3 app.py")
+    else:
+      G = get_ipython().getoutput("python3 app.py")
