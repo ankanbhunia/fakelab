@@ -244,8 +244,115 @@ def video_from_sequence( input_dir, output_file, reference_file=None, ext=None, 
                                "pix_fmt": "yuv420p",
                               })
     else:
-        output_kwargs.update ({
+        output_kwargs.update ({"c:v": "libx264",
                                "b:v": "%dM" %(bitrate),
+                               "pix_fmt": "yuv420p",
+                              })
+
+    if include_audio and ref_in_a is not None:
+        output_kwargs.update ({"c:a": "aac",
+                               "b:a": "192k",
+                               "ar" : "48000",
+                               "strict": "experimental"
+                               })
+
+    job = ( ffmpeg.output(*output_args, **output_kwargs).overwrite_output() )
+
+    try:
+        job_run = job.run_async(pipe_stdin=True)
+
+        for image_path in input_image_paths:
+            with open (image_path, "rb") as f:
+                image_bytes = f.read()
+                job_run.stdin.write (image_bytes)
+
+        job_run.stdin.close()
+        job_run.wait()
+    except:
+        io.log_err ("ffmpeg fail, job commandline:" + str(job.compile()) )
+
+
+
+
+def video_from_sequence_( input_dir, output_file, reference_file=None, ext=None, fps=None, bitrate=None, include_audio=False, lossless=None ):
+    input_path = Path(input_dir)
+    output_file_path = Path(output_file)
+    reference_file_path = Path(reference_file) if reference_file is not None else None
+
+    if not input_path.exists():
+        io.log_err("input_dir not found.")
+        return
+
+    if not output_file_path.parent.exists():
+        output_file_path.parent.mkdir(parents=True, exist_ok=True)
+        return
+
+    out_ext = output_file_path.suffix
+
+    if ext is None:
+        ext = io.input_str ("Input image format (extension)", "png")
+
+    if lossless is None:
+        lossless = io.input_bool ("Use lossless codec", False)
+
+    video_id = None
+    audio_id = None
+    ref_in_a = None
+    if reference_file_path is not None:
+        if reference_file_path.suffix == '.*':
+            reference_file_path = pathex.get_first_file_by_stem (reference_file_path.parent, reference_file_path.stem)
+        else:
+            if not reference_file_path.exists():
+                reference_file_path = None
+
+        if reference_file_path is None:
+            io.log_err("reference_file not found.")
+            return
+
+        #probing reference file
+        probe = ffmpeg.probe (str(reference_file_path))
+
+        #getting first video and audio streams id with fps
+        for stream in probe['streams']:
+            if video_id is None and stream['codec_type'] == 'video':
+                video_id = stream['index']
+                fps = stream['r_frame_rate']
+
+            if audio_id is None and stream['codec_type'] == 'audio':
+                audio_id = stream['index']
+
+        if audio_id is not None:
+            #has audio track
+            ref_in_a = ffmpeg.input (str(reference_file_path))[str(audio_id)]
+
+    if fps is None:
+        #if fps not specified and not overwritten by reference-file
+        fps = max (1, io.input_int ("Enter FPS", 25) )
+
+    if not lossless and bitrate is None:
+        bitrate = 1#max (1, settings.bitrate)#io.input_int ("Bitrate of output file in MB/s", 16) 
+
+    input_image_paths = pathex.get_image_paths(input_path)
+
+    i_in = ffmpeg.input('pipe:', format='image2pipe', r=fps)
+
+    output_args = [i_in]
+
+    if include_audio and ref_in_a is not None:
+        output_args += [ref_in_a]
+
+    output_args += [str (output_file_path)]
+
+    output_kwargs = {}
+
+    if lossless:
+        output_kwargs.update ({"c:v": "libx264",
+                               "crf": "0",
+                               "pix_fmt": "yuv420p",
+                              })
+    else:
+        output_kwargs.update ({"c:v": "libx264",
+                               "b:v": "%dM" %(1),
                                "pix_fmt": "yuv420p",
                               })
 

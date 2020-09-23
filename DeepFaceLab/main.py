@@ -235,6 +235,30 @@ if __name__ == "__main__":
     p.add_argument('--lossless', action="store_true", dest="lossless", default=False, help="PNG codec.")
 
     p.set_defaults(func=process_videoed_video_from_sequence)
+    
+    def process_videoed_video_from_sequence_(arguments):
+        osex.set_process_lowest_prio()
+        from mainscripts import VideoEd
+        VideoEd.video_from_sequence_ (input_dir      = arguments.input_dir,
+                                     output_file    = arguments.output_file,
+                                     reference_file = arguments.reference_file,
+                                     ext      = arguments.ext,
+                                     fps      = arguments.fps,
+                                     bitrate  = arguments.bitrate,
+                                     include_audio = arguments.include_audio,
+                                     lossless = arguments.lossless)
+
+    p = videoed_parser.add_parser( "video-from-sequence_", help="Make video from image sequence.")
+    p.add_argument('--input-dir', required=True, action=fixPathAction, dest="input_dir", help="Input file to be processed. Specify .*-extension to find first file.")
+    p.add_argument('--output-file', required=True, action=fixPathAction, dest="output_file", help="Input file to be processed. Specify .*-extension to find first file.")
+    p.add_argument('--reference-file', action=fixPathAction, dest="reference_file", help="Reference file used to determine proper FPS and transfer audio from it. Specify .*-extension to find first file.")
+    p.add_argument('--ext', dest="ext", default='png', help="Image format (extension) of input files.")
+    p.add_argument('--fps', type=int, dest="fps", default=None, help="FPS of output file. Overwritten by reference-file.")
+    p.add_argument('--bitrate', type=int, dest="bitrate", default=None, help="Bitrate of output file in Megabits.")
+    p.add_argument('--include-audio', action="store_true", dest="include_audio", default=False, help="Include audio from reference file.")
+    p.add_argument('--lossless', action="store_true", dest="lossless", default=False, help="PNG codec.")
+
+    p.set_defaults(func=process_videoed_video_from_sequence_)
 
     facesettool_parser = subparsers.add_parser( "facesettool", help="Faceset tools.").add_subparsers()
 

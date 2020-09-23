@@ -340,7 +340,7 @@ try:
             ##########print ('###############################' + output_name)
 
             os.system('echo | python DeepFaceLab/main.py merge --input-dir workspace/data_dst --output-dir workspace/data_dst/merged --output-mask-dir workspace/data_dst/merged_mask --aligned-dir workspace/data_dst/aligned --model-dir workspace/model --model SAEHD')
-            os.system('echo | python DeepFaceLab/main.py videoed video-from-sequence --input-dir workspace/data_dst/merged --output-file workspace/'+output_name+' --reference-file workspace/data_dst.mp4 --include-audio')
+            os.system('echo | python DeepFaceLab/main.py videoed video-from-sequence_ --input-dir workspace/data_dst/merged --output-file workspace/'+output_name+' --reference-file workspace/data_dst.mp4 --include-audio')
             os.system('cp /content/workspace/'+output_name+' '+drive_path)
             # need to install xattr
             
@@ -561,7 +561,7 @@ try:
                     
                     get_preview
 
-                    q.put('Training...')
+                    q.put('Training In Progress')
 
                     clear_output()
                     p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
@@ -614,7 +614,7 @@ try:
                     thr2.start()
                     thread_list.append(thr2)
                     clear_output()
-                    q.put('Training...')
+                    q.put('Training In Progress')
 
                     thr3 = Process(target = get_preview, args=())
                     thr3.daemon=True   
@@ -729,7 +729,7 @@ try:
                         thr2.start()
                         thread_list.append(thr2)
                         clear_output()
-                        q.put('Training...')
+                        q.put('Training In Progress')
                         thr3 = Process(target = get_preview, args=())
                         thr3.daemon=True   
                         thr3.start()
@@ -886,7 +886,7 @@ try:
                             thr2.start()
                             thread_list.append(thr2)
                             clear_output()
-                            q.put('Training...')
+                            q.put('Training In Progress')
 
                             thr3 = Process(target = get_preview, args=())
                             thr3.daemon=True   
@@ -959,7 +959,7 @@ try:
                     thr3.start()
                     thread_list.append(thr3)
                     clear_output()
-                    q.put('Training...')
+                    q.put('Training In Progress')
 
 
                     p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
@@ -1026,7 +1026,7 @@ try:
                     
                     clear_output()
                     
-                    q.put('Training...')
+                    q.put('Training In Progress')
 
 
                     p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
@@ -3189,9 +3189,15 @@ try:
               try:
                 
                 header = watch.get_interval()
-                iters = str(open('/content/workspace/model/iteration.txt','r').read())
                 
-                itt = '[#Steps: '+iters + '] '
+                try:
+                    iters = str(open('/content/workspace/model/iteration.txt','r').read())
+                    
+                    itt = '['+iters + '] '
+                    
+                except:
+    
+                    itt = ''
                  
               except:
               
@@ -3664,36 +3670,43 @@ try:
               
         def update__(interval):
         
-            number_of_files = len(os.listdir('/content/workspace/preview/merged'))
-            total_number_of_files = len(os.listdir('/content/workspace/preview/')) - 3
-            
-            done =  int((number_of_files/total_number_of_files)*100)
-            #print (done)
-            
-            
             try:
-                secss = time.time() - os.path.getctime(glob.glob("/content/assets/*mp4")[0])
-                sec_s = ' [Updated ' +str(int(secss)//60)  + ' minutes ago]'
-            
+        
+                number_of_files = len(os.listdir('/content/workspace/preview/merged'))
+                total_number_of_files = len(os.listdir('/content/workspace/preview/')) - 3
                 
-            except:
-                sec_s = ''
-            
-            try:
-            
-                #$print (time.time() - os.path.getctime(glob.glob("/content/assets/*mp4")[0]))
-                if secss <=5:
+                done =  int((number_of_files/total_number_of_files)*100)
+                #print (done)
                 
-                    #print ('updates')
+                
+                try:
+                    secss = time.time() - os.path.getctime(glob.glob("/content/assets/*mp4")[0])
+                    sec_s = ' [Updated ' +str(int(secss)//60)  + ' minutes ago]'
+                
                     
-                    return [done, os.path.join('/assets', glob.glob("/content/assets/*mp4")[0].split('/')[-1]),'Preview'+sec_s]
+                except:
+                    sec_s = ''
                 
-                else:
+                try:
+                
+                    #$print (time.time() - os.path.getctime(glob.glob("/content/assets/*mp4")[0]))
+                    if secss <=5:
+                    
+                        #print ('updates')
+                        
+                        return [done, os.path.join('/assets', glob.glob("/content/assets/*mp4")[0].split('/')[-1]),'Preview'+sec_s]
+                    
+                    else:
+                        return [done, dash.no_update, 'Preview'+sec_s]
+                        
+                except:
+                
                     return [done, dash.no_update, 'Preview'+sec_s]
                     
+                    
             except:
             
-                return [done, dash.no_update, 'Preview'+sec_s]
+                return [dash.no_update,dash.no_update,dash.no_update]
                     
         @app.callback([Output('merge_progress', 'value'),Output('convert_result', 'children')],
                     [Input('okay_merge', 'n_clicks'), Input('interval-1', 'n_intervals')])

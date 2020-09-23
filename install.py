@@ -16,6 +16,9 @@ os.system('pip3 install dash_daq')
 os.system('pip3 install dash-editor-components')
 #os.system('pip3 install scipy==1.1.0')
 os.system('sudo apt-get install -y xattr')
+os.system('git clone https://github.com/xhlulu/dash-player.git')
+os.system('cd dash-player && npm install')
+
 Mode = "install" 
 
 from pathlib import Path
