@@ -122,6 +122,11 @@ def trainerThread (s2c, c2s, e,
 
                         iter, iter_time = model.train_one_iter()
 
+                        f = open('workspace/model/iteration.txt','w+')
+                        f.write(str(iter))
+                        f.close()
+                        
+                        
                         loss_history = model.get_loss_history()
                         time_str = time.strftime("[%H:%M:%S]")
                         if iter_time >= 10:
@@ -305,6 +310,7 @@ def main(**kwargs):
                         loss_history_to_show = loss_history[-show_last_history_iters_count:]
 
                     lh_img = models.ModelBase.get_loss_history_preview(loss_history_to_show, iter, w, c)
+                    
                     final = np.concatenate ( [final, lh_img], axis=0 )
 
                 final = np.concatenate ( [final, selected_preview_rgb], axis=0 )

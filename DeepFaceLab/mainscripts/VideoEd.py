@@ -244,7 +244,7 @@ def video_from_sequence( input_dir, output_file, reference_file=None, ext=None, 
                                "pix_fmt": "yuv420p",
                               })
     else:
-        output_kwargs.update ({"c:v": "libx264",
+        output_kwargs.update ({
                                "b:v": "%dM" %(bitrate),
                                "pix_fmt": "yuv420p",
                               })
