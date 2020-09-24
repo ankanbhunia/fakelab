@@ -367,6 +367,8 @@ try:
             
         def get_preview():
         
+            time.sleep(600)
+        
             while 1:
             
                 if len(os.listdir('/content/workspace/model'))>5:
@@ -375,7 +377,7 @@ try:
                     os.mkdir('/content/workspace/preview/merged')
                 
                     os.system("printf '0\nCPU\n' | python DeepFaceLab/main.py merge --input-dir /content/workspace/preview --output-dir /content/workspace/preview/merged --output-mask-dir /content/workspace/preview/merged_mask --aligned-dir /content/workspace/preview/aligned --model-dir workspace/model --model SAEHD")
-                    os.system("printf '10\n' | python DeepFaceLab/main.py videoed video-from-sequence --input-dir /content/workspace/preview/merged --output-file workspace/result_preview.mp4")
+                    os.system("printf '10\n' | python DeepFaceLab/main.py videoed video-from-sequence_  --input-dir /content/workspace/preview/merged --output-file workspace/result_preview.mp4")
                     import moviepy.editor as mp
 
                     if not os.path.isdir('/content/assets'): os.mkdir('/content/assets')
