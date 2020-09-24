@@ -1186,7 +1186,7 @@ try:
             id='video-player',
             #url='http://media.w3.org/2010/05/bunny/movie.mp4',
             url = url,
-            controls=False, loop = True, playing = True, width ='400px', height = '228px'
+            controls=True, loop = True, playing = True, width ='400px', height = '228px'
         ), dbc.Progress(id = 'preview_progress')], )
 
         #Images = loading([

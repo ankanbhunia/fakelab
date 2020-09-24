@@ -12,6 +12,10 @@ import cv2
 import models
 from core.interact import interact as io
 
+import tensorflow as tf
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
+sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+
 def trainerThread (s2c, c2s, e,
                     model_class_name = None,
                     saved_models_path = None,
@@ -154,7 +158,7 @@ def trainerThread (s2c, c2s, e,
                             else:
                                 io.log_info (loss_string, end='\r')
 
-                        if model.get_iter() == 1:
+                        if model.get_iter() == 100:
                             model_save()
 
                         if model.get_target_iter() != 0 and model.is_reached_iter_goal():
