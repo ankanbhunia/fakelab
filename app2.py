@@ -378,16 +378,22 @@ try:
                 
                     os.system("printf '0\nCPU\n' | python DeepFaceLab/main.py merge --input-dir /content/workspace/preview --output-dir /content/workspace/preview/merged --output-mask-dir /content/workspace/preview/merged_mask --aligned-dir /content/workspace/preview/aligned --model-dir workspace/model --model SAEHD")
                     os.system("printf '10\n' | python DeepFaceLab/main.py videoed video-from-sequence_  --input-dir /content/workspace/preview/merged --output-file workspace/result_preview.mp4")
+                    
                     import moviepy.editor as mp
 
                     if not os.path.isdir('/content/assets'): os.mkdir('/content/assets')
-
-                    clip = mp.VideoFileClip("/content/workspace/result_preview.mp4")
-                    clip_resized = clip.resize(height=360) # make the height 360px ( According to moviePy documenation The width is then computed so that the width/height ratio is conserved.)
-                    convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
-                    [os.remove(i) for i in glob.glob("/content/assets/*mp4")]
                     
-                    clip_resized.write_videofile("/content/assets/result_preview"+convert_id+".mp4")
+                    if os.path.isfile("/content/workspace/result_preview.mp4"):
+                        clip = mp.VideoFileClip("/content/workspace/result_preview.mp4")
+                        clip_resized = clip.resize(height=360) # make the height 360px ( According to moviePy documenation The width is then computed so that the width/height ratio is conserved.)
+                        convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
+                        [os.remove(i) for i in glob.glob("/content/assets/*mp4")]
+                        
+                        clip_resized.write_videofile("/content/assets/result_preview"+convert_id+".mp4")
+                    else:
+                    
+                        print ('No file found')
+                        time.sleep(60)
                     
                     
                 else:
@@ -561,7 +567,7 @@ try:
                     thr3.start()
                     thread_list.append(thr3)
                     
-                    get_preview
+                    
 
                     q.put('Training In Progress')
 
