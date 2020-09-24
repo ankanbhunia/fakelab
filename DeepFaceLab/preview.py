@@ -13,9 +13,9 @@ if not os.path.isdir('/content/workspace/preview/merged'): os.mkdir('/content/wo
 if not os.path.isdir('/content/workspace/preview/merged_mask'): os.mkdir('/content/workspace/preview/merged_mask')
 
 f = glob.glob('/content/workspace/data_dst/aligned/*')
-if len(f)>200:
-  h = np.arange(0,200,2)
-  f = np.array(sorted(f)[:200])[h]
+if len(f)>50:
+  h = np.arange(0,50,2)
+  f = np.array(sorted(f)[:50])[h]
 
 else:
   h = np.arange(0,len(f),2)
@@ -25,9 +25,9 @@ for i in f:
   copyfile(i, os.path.join('/content/workspace/preview/aligned/', i.split('/')[-1]))
 f = glob.glob('/content/workspace/data_dst/*g')
 
-if len(f)>200:
-  h = np.arange(0,200,2)
-  f = np.array(sorted(f)[:200])[h]
+if len(f)>50:
+  h = np.arange(0,50,2)
+  f = np.array(sorted(f)[:50])[h]
 
 else:
   h = np.arange(0,len(f),2)

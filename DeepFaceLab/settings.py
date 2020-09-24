@@ -41,7 +41,7 @@ pretrain = False #Pretrain the model with large amount of various faces. After t
 ############################################
 
 merging_mode = 1 #(0) original (1) overlay (2) hist-match (3) seamless (4) seamless-hist-match (5) raw-rgb (6) raw-predict
-mask_merging_mode = 2 #(1) dst (2) learned-prd (3) learned-dst (4) learned-prd*learned-dst (5) learned-prd+learned-dst (6) XSeg-prd (7) XSeg-dst (8) XSeg-prd*XSeg-dst (9) learned-prd*learned-dst*XSeg-prd*XSeg-dst
+mask_merging_mode = 3 #(1) dst (2) learned-prd (3) learned-dst (4) learned-prd*learned-dst (5) learned-prd+learned-dst (6) XSeg-prd (7) XSeg-dst (8) XSeg-prd*XSeg-dst (9) learned-prd*learned-dst*XSeg-prd*XSeg-dst
 sharpen_mode = 1 #(0) None (1) box (2) gaussian
 blursharpen_amount = 0 # [-100,100]
 erode_mask_modifier = 0 # [-400, 400] Choose erode mask modifier
