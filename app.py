@@ -106,7 +106,7 @@ try:
 
 
         def killall():
-            g = get_ipython().getoutput('sudo fuser -v /dev/nvidia-uvm')
+            g = getoutput('sudo fuser -v /dev/nvidia-uvm')
             import os
             pids = []
             pid = os.getpid()
@@ -119,6 +119,8 @@ try:
                     os.system('kill -9 '+str(j))
                 except:
                   pass
+                  
+        killall()
         
         class merging_vars:
 
@@ -391,7 +393,7 @@ try:
                     os.system('rm -r /content/workspace/preview/merged')
                     os.mkdir('/content/workspace/preview/merged')
                 
-                    os.system("printf '0\nCPU\n' | python DeepFaceLab/main.py merge --input-dir /content/workspace/preview --output-dir /content/workspace/preview/merged --output-mask-dir /content/workspace/preview/merged_mask --aligned-dir /content/workspace/preview/aligned --model-dir workspace/model --model SAEHD")
+                    os.system("printf '0\nCPU\n' | python DeepFaceLab/merger/Merger_preview.py")
                     os.system("printf '10\n' | python DeepFaceLab/main.py videoed video-from-sequence_  --input-dir /content/workspace/preview/merged --output-file workspace/result_preview.mp4")
                     
                     import moviepy.editor as mp
@@ -1565,10 +1567,10 @@ try:
                 
                 
                 
-                dbc.Toast([dbc.Row([dbc.Col(Progress), dbc.Col(right_frame)])], id="toggle-add-Progress",header="Getting Started",is_open=True,icon="primary",dismissable=True,  style={"maxWidth": "1000px"}),
-                #dbc.Toast(Preview_vid, id="toggle-add-Preview_vid",header="Preview"+sec_s,is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "450px"}),
+                dbc.Row([dbc.Col(dbc.Toast(Progress, id="toggle-add-Progress",header="Getting Started",is_open=True,icon="primary",dismissable=True,  style={"maxWidth": "500px"})),
+                dbc.Col(dbc.Toast(right_frame, id="toggle-add-right_frame",header=""+sec_s,is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "500px"}))], no_gutters=True,),
             
-           
+
                
                 #dbc.Toast(Images, id="toggle-add-Images",header="Generated Images",is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "800px"}),
                 dbc.Toast(Settings, id="toggle-add-Settings",header="Edit configuration file",is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "800px"}),
@@ -2991,7 +2993,7 @@ try:
             return is_open
             
         @app.callback(
-            Output("toggle-add-Preview_vid", "is_open"),
+            Output("toggle-add-right_frame", "is_open"),
             [Input("interval-1", "n_intervals")]
         )
         def open_toast1(n):
@@ -3004,6 +3006,9 @@ try:
             else:
             
                 return False
+                
+       
+            
                 
                 
         @app.callback(Output("tempvar", "value"), [Input('Start-click', 'n_clicks')])
@@ -3564,100 +3569,104 @@ try:
             
                 face_type = FaceType.WHOLE_FACE
                 
-            
+            try:
         
-            npy_ = os.path.join('/tmp', npy_files[ind_preview])
-        
+                npy_ = os.path.join('/tmp', npy_files[ind_preview])
             
-            ##########print (npy_)
-            
-            cfg_merge = merging_vars(
-                   face_type = face_type,
-                   mask_mode = int(mask_mode_),
-                   mode = mode_,
-                   erode_mask_modifier = Erode_,
-                   blur_mask_modifier = Blur_,
-                   color_transfer_mode = int(color_mode_),
-                   masked_hist_match = True,
-                   hist_match_threshold = 255,
-                   motion_blur_power = motion_blur_power_,
-                   blursharpen_amount = blursharpen_amount_,
-                   image_denoise_power = image_denoise_power_,
-                   bicubic_degrade_power = 0,
-                   sharpen_mode = 1,
-                   color_degrade_power = color_degrade_power_,
-                   horizontal_shear = horizontal_shear,
-                   vertical_shear = vertical_shear,
-                   horizontal_shift = horizontal_shift,
-                   vertical_shift = vertical_shift
-                   )
-                   
-                   
-            result, _ = Merger_tune.MergeMaskedFace_test(npy_, cfg_merge)
-            
-            
-            
-            if trigger_id == 'okay_merge.n_clicks':
-            
-                dict_1 = {'original':0, 'overlay':1, 'hist-match':2 ,'seamless':3 ,'seamless-hist-match':4 , 'raw-rgb':5 , 'raw-predict':6}
                 
-                dict_2 = {0: 'None', 1:'rct',2:'lct',3:'mkl',4:'mkl-m',5:'idt',6:'idt-m',7:'sot-m',8:'mix-m'}
+                ##########print (npy_)
                 
-                with open('/content/DeepFaceLab/settings.py', 'a') as f:
-
-                    f.write("\nmerging_mode = "+ str(dict_1[cfg_merge.mode]))
-                    f.write("\nmask_merging_mode = " + str(cfg_merge.mask_mode))
-                    f.write("\nblursharpen_amount = " + str(cfg_merge.blursharpen_amount))
-                    f.write("\nerode_mask_modifier = "+ str(cfg_merge.erode_mask_modifier))
-                    f.write("\nblur_mask_modifier ="+ str(cfg_merge.blur_mask_modifier))
-                    f.write("\nmotion_blur_power = "+ str(cfg_merge.motion_blur_power))
-                    #f.write("\noutput_face_scale = "+ cfg_merge)
-
-                    if cfg_merge.color_transfer_mode == 0:
-
-                      f.write("\ncolor_transfer_mode = None")
-
-                    else:
-
-                      f.write("\ncolor_transfer_mode = '"+ dict_2[cfg_merge.color_transfer_mode]+"'")
-
-                    #f.write("\nsuper_resolution_power = "+ cfg_merge)
-                    f.write("\nimage_denoise_power = "+ str(cfg_merge.image_denoise_power))
-                    #f.write("\nbicubic_degrade_power = "+ cfg_merge)
-                    f.write("\ncolor_degrade_power = "+ str(cfg_merge.color_degrade_power))
-                    #f.write("\nmasked_hist_match = "+ cfg_merge)
-                    #f.write("\nhist_match_threshold ="+cfg_merge)
-                    f.write("\nhorizontal_shear = "+str(cfg_merge.horizontal_shear))
-                    f.write("\nvertical_shear = "+ str(cfg_merge.vertical_shear))
-                    f.write("\nhorizontal_shift = "+ str(cfg_merge.horizontal_shift))
-                    f.write("\nvertical_shift = "+ str(cfg_merge.vertical_shift))
+                cfg_merge = merging_vars(
+                       face_type = face_type,
+                       mask_mode = int(mask_mode_),
+                       mode = mode_,
+                       erode_mask_modifier = Erode_,
+                       blur_mask_modifier = Blur_,
+                       color_transfer_mode = int(color_mode_),
+                       masked_hist_match = True,
+                       hist_match_threshold = 255,
+                       motion_blur_power = motion_blur_power_,
+                       blursharpen_amount = blursharpen_amount_,
+                       image_denoise_power = image_denoise_power_,
+                       bicubic_degrade_power = 0,
+                       sharpen_mode = 1,
+                       color_degrade_power = color_degrade_power_,
+                       horizontal_shear = horizontal_shear,
+                       vertical_shear = vertical_shear,
+                       horizontal_shift = horizontal_shift,
+                       vertical_shift = vertical_shift
+                       )
+                       
+                       
+                result, _ = Merger_tune.MergeMaskedFace_test(npy_, cfg_merge)
+                
+                
+                
+                if trigger_id == 'okay_merge.n_clicks':
+                
+                    dict_1 = {'original':0, 'overlay':1, 'hist-match':2 ,'seamless':3 ,'seamless-hist-match':4 , 'raw-rgb':5 , 'raw-predict':6}
                     
-                    f.close()
+                    dict_2 = {0: 'None', 1:'rct',2:'lct',3:'mkl',4:'mkl-m',5:'idt',6:'idt-m',7:'sot-m',8:'mix-m'}
+                    
+                    with open('/content/DeepFaceLab/settings.py', 'a') as f:
+
+                        f.write("\nmerging_mode = "+ str(dict_1[cfg_merge.mode]))
+                        f.write("\nmask_merging_mode = " + str(cfg_merge.mask_mode))
+                        f.write("\nblursharpen_amount = " + str(cfg_merge.blursharpen_amount))
+                        f.write("\nerode_mask_modifier = "+ str(cfg_merge.erode_mask_modifier))
+                        f.write("\nblur_mask_modifier ="+ str(cfg_merge.blur_mask_modifier))
+                        f.write("\nmotion_blur_power = "+ str(cfg_merge.motion_blur_power))
+                        #f.write("\noutput_face_scale = "+ cfg_merge)
+
+                        if cfg_merge.color_transfer_mode == 0:
+
+                          f.write("\ncolor_transfer_mode = None")
+
+                        else:
+
+                          f.write("\ncolor_transfer_mode = '"+ dict_2[cfg_merge.color_transfer_mode]+"'")
+
+                        #f.write("\nsuper_resolution_power = "+ cfg_merge)
+                        f.write("\nimage_denoise_power = "+ str(cfg_merge.image_denoise_power))
+                        #f.write("\nbicubic_degrade_power = "+ cfg_merge)
+                        f.write("\ncolor_degrade_power = "+ str(cfg_merge.color_degrade_power))
+                        #f.write("\nmasked_hist_match = "+ cfg_merge)
+                        #f.write("\nhist_match_threshold ="+cfg_merge)
+                        f.write("\nhorizontal_shear = "+str(cfg_merge.horizontal_shear))
+                        f.write("\nvertical_shear = "+ str(cfg_merge.vertical_shear))
+                        f.write("\nhorizontal_shift = "+ str(cfg_merge.horizontal_shift))
+                        f.write("\nvertical_shift = "+ str(cfg_merge.vertical_shift))
+                        
+                        f.close()
+                    
                 
-            
-            result = imutils.resize(result*255, height=512)
-            
-            #########print (result.shape)
-            
-            ret, frame = cv2.imencode('.png',result )
+                result = imutils.resize(result*255, height=512)
+                
+                #########print (result.shape)
+                
+                ret, frame = cv2.imencode('.png',result )
 
-            frame = base64.b64encode(frame)
+                frame = base64.b64encode(frame)
 
-            src = 'data:image/png;base64,{}'.format(frame.decode())
+                src = 'data:image/png;base64,{}'.format(frame.decode())
+                
+                return [src, ' ']
             
-            return [src, ' ']
+            except:
         
-        
+                return ["", ' ']
          
            
                 
-        @app.callback([Output('preview_progress', 'value'),Output('video-player', 'url'), Output('toggle-add-Preview_vid', 'header')],
+        @app.callback([Output('preview_progress', 'value'),Output('video-player', 'url'), Output('toggle-add-right_frame', 'header')],
                     [Input('interval-1', 'n_intervals')])
                     
               
         def update__(interval):
         
             try:
+            
+                #print ('f')
         
                 number_of_files = len(os.listdir('/content/workspace/preview/merged'))
                 total_number_of_files = len(os.listdir('/content/workspace/preview/')) - 3
@@ -3676,7 +3685,7 @@ try:
                 
                 try:
                 
-                    #$print (time.time() - os.path.getctime(glob.glob("/content/assets/*mp4")[0]))
+                    #print (time.time() - os.path.getctime(glob.glob("/content/assets/*mp4")[0]))
                     if secss <=5:
                     
                         #print ('updates')
@@ -3771,7 +3780,7 @@ try:
                 
                 done =  int((number_of_files/total_number_of_files)*100)
                 
-                tar_di = os.path.join(drive_path_, 'result_' + convert_id + '.mp4'
+                tar_di = os.path.join(drive_path_, 'result_' + convert_id + '.mp4')
             
                 if os.path.isfile(tar_di):
 
