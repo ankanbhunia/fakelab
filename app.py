@@ -3770,13 +3770,14 @@ try:
                 total_number_of_files = len(os.listdir('/content/workspace/data_dst/'))-2 
                 
                 done =  int((number_of_files/total_number_of_files)*100)
+                
+                tar_di = os.path.join(drive_path_, 'result_' + convert_id + '.mp4'
             
-            
-                if os.path.isfile('/content/drive/My Drive/result_' + convert_id + '.mp4'):
+                if os.path.isfile(tar_di):
 
                     #time.sleep(10)
                 
-                    fid = getoutput("xattr -p 'user.drive.id' '/content/drive/My Drive/result_'"+convert_id+"'.mp4'")
+                    fid = getoutput("xattr -p 'user.drive.id' '"+tar_di+"'")
                     url = 'https://docs.google.com/file/d/'+fid
 
                 
