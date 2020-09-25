@@ -104,6 +104,21 @@ try:
         drive_path = '\ '.join(drive_path_.split(' '))
         
 
+
+        def killall():
+            g = get_ipython().getoutput('sudo fuser -v /dev/nvidia-uvm')
+            import os
+            pids = []
+            pid = os.getpid()
+            for i in g:
+              for j in i.split(' '):
+                try:
+                  j = int(j)
+                  if j!=pid:
+                    pids.append(j)
+                    os.system('kill -9 '+str(j))
+                except:
+                  pass
         
         class merging_vars:
 
@@ -151,7 +166,7 @@ try:
             self.horizontal_shift = horizontal_shift
             self.vertical_shift = vertical_shift
 
-        [os.remove(os.path.join('/tmp',i)) for i in os.listdir('/tmp') if i.endswith('.npy')]
+        #[os.remove(os.path.join('/tmp',i)) for i in os.listdir('/tmp') if i.endswith('.npy')]
         
         def shutdown():
             func = request.environ.get('werkzeug.server.shutdown')
@@ -1178,6 +1193,7 @@ try:
                 ), html.Br(), html.Div(id = 'preview_graph'), html.Br(),loading(html.Div(id = 'preview_imgs'))]), #dcc.RadioItems(id = 'Progress_select', value = ''), html.Hr(id = 'hr2'), 
         #dbc.Button('Continue', size="sm", id = 'start_text_continue'),  
         #html.Hr(id = 'hr3'), html.Div(id = 'progress_field')]
+        
         try:
             url=os.path.join('/assets', glob.glob("/content/assets/*mp4")[0].split('/')[-1])
         except:
@@ -1186,8 +1202,320 @@ try:
             id='video-player',
             #url='http://media.w3.org/2010/05/bunny/movie.mp4',
             url = url,
-            controls=True, loop = True, playing = True, width ='400px', height = '228px'
-        ), dbc.Progress(id = 'preview_progress')], )
+            controls=True, loop = True, playing = True, width='100%', height='100%', 
+        ), dbc.Progress(id = 'preview_progress', style={"height": "3px"})
+        
+        
+        
+        
+        ])
+        
+        global option_convert  
+        option_convert = [{"label": '(1) Current Workspace', "value" : 0}, {"label": '(2) Load Workspace', "value" : 1, 'disabled': True}]
+
+        for j,idx in enumerate([i for i in os.listdir(drive_path_) if i.startswith('workspace')]):
+
+            option_convert.append({"label": ' ' + idx + ' [' + str(os.path.getsize(os.path.join(drive_path_,idx)) >> 20) +' MB]', "value" : j+2} )
+        if len(npy_files)>0:
+            convert_disabled = False
+            
+        else:
+            convert_disabled = True
+            
+            
+            
+        
+            
+        
+        size_layout  = dbc.Card(
+            dbc.CardBody(
+            
+            
+                [   dbc.Row(daq.Slider(min=0,max=50,value=10,step=1, id = "size_step", size = 150)),
+                
+                    html.Hr(),
+                 
+                    dbc.Row(dbc.Button(outline=True, id = 'v_plus_size', active=False, disabled = convert_disabled, color="success", className="fas fa-plus-circle"),justify="center",),
+                 
+                    dbc.Row([dbc.Col(dbc.Button(outline=True, id = 'h_minus_size', active=False, disabled = convert_disabled, color="success", className="fas fa-minus-circle")),  dbc.Col(dbc.Button(outline=True, id = 'h_plus_size', active=False, disabled = convert_disabled, color="success", className="fas fa-plus-circle"))]),
+              
+                    dbc.Row(dbc.Button(outline=True, id = 'v_minus_size', active=False, disabled = convert_disabled, color="success", className="fas fa-minus-circle"), justify="center"),
+                    
+                    dbc.Tooltip('Stretch face vertically', target="v_plus_size"),
+                    dbc.Tooltip('Shrink face horizontally', target="h_minus_size"),
+                    dbc.Tooltip('Stretch face horizontally', target="h_plus_size"),
+                    dbc.Tooltip('Shrink face vertically', target="v_minus_size"),
+                ]
+            ),
+            style={"width": "10rem"},
+        )
+
+
+
+        shift_layout = dbc.Card(
+            dbc.CardBody(
+                [   dbc.Row(daq.Slider(min=0,max=50,value=10,step=1, id = "shift_step", size = 150)),
+                    
+                    html.Hr(),
+                    
+                    dbc.Row(dbc.Button(outline=True, id = 'v_plus_shift', active=False, disabled = convert_disabled, color="success", className="fas fa-chevron-circle-up"),justify="center",),
+                 
+                    dbc.Row([dbc.Col(dbc.Button(outline=True, id = 'h_minus_shift', active=False, disabled = convert_disabled, color="success", className="fas fa-chevron-circle-left")),  dbc.Col(dbc.Button(outline=True, id = 'h_plus_shift', active=False, disabled = convert_disabled, color="success", className="fas fa-chevron-circle-right"))]),
+              
+                    dbc.Row(dbc.Button(outline=True, id = 'v_minus_shift', active=False, disabled = convert_disabled, color="success", className="fas fa-chevron-circle-down"), justify="center"),
+                    
+                    dbc.Tooltip('Move face upward', target="v_plus_shift"),
+                    dbc.Tooltip('Move face to the left', target="h_minus_shift"),
+                    dbc.Tooltip('Move face to the right', target="h_plus_shift"),
+                    dbc.Tooltip('Move face downward', target="v_minus_shift"),
+                ]
+            ),
+            style={"width": "10rem"},
+        )
+        
+        
+        
+        
+        
+        basic_Set = [ html.Br(),
+        
+        dbc.Row([dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Face type", addon_type="prepend"),dbc.Select(id = 'face_type_', options = [{'label':'Head', "value" :0},
+        {'label':'Face', "value" :1}, 
+        {'label':'Full Face', "value" :2}, 
+        ], value = '0')], size="sm"),),
+        
+        dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Mask type", addon_type="prepend"),dbc.Select(id = 'mask_mode_', options = [{'label':'dst', "value" :1},
+        {'label':'learned-prd', "value" :2}, 
+        {'label':'learned-dst', "value" :3}, 
+        {'label':'learned-prd*learned-dst', "value" :4}, 
+        {'label':'learned-prd+learned-dst', "value" :5},  
+        {'label':'XSeg-prd', "value" :6}, 
+        {'label':'XSeg-dst', "value" :7},  
+        {'label':'XSeg-prd*XSeg-dst', "value" :8}, 
+        {'label':'learned-prd*learned-dst*XSeg-prd*XSeg-dst', "value" :9}], value = 3),], size="sm",))], justify = 'center',  no_gutters=True,),
+        
+        dbc.Row([dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Mode", addon_type="prepend"),dbc.Select(id = 'mode_', options = [{'label':'original', "value" :'original'},
+        {'label':'overlay', "value" :'overlay'}, 
+        {'label':'hist-match', "value" :'hist-match'}, 
+        {'label':'seamless', "value" :'seamless'}, 
+        {'label':'seamless-hist-match', "value" :'seamless-hist-match'},  
+        {'label':'raw-rgb', "value" :'raw-rgb'}, 
+        {'label':'raw-predict', "value" :'raw-predict'}], value = 'overlay') ], size="sm",)),
+        
+        dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Color mode", addon_type="prepend"),dbc.Select(id = 'color_mode_', options = [{'label':'None', "value" :0},
+        {'label':'rct', "value" :1}, 
+        {'label':'lct', "value" :2}, 
+        {'label':'mkl', "value" :3}, 
+        {'label':'mkl-m', "value" :4},  
+        {'label':'idt', "value" :5}, 
+        {'label':'idt-m', "value" :6},  
+        {'label':'sot-m', "value" :7}, 
+        {'label':'mix-m', "value" :8}], value = '0')], size="sm"))], justify = 'center',  no_gutters=True,),
+        
+ 
+            
+        
+                    ]
+                    
+                    
+        adv_set = [dbc.CardBody([
+          dcc.Slider(
+          min=0,
+          max=100,
+          value=0,
+          step=1,
+          id = "motion_blur_power_", marks = {0: '0', 100:'100', 50: 'Motion Blur Power'}
+        ),
+        
+        html.Br(),
+        dcc.Slider(
+          min=-400,
+          max=400,
+          value=0,
+          step=1,
+          id = "Erode_" , marks = {-400: '-400', 0:'Erode', 400:'+400'}
+        )
+        ,
+        html.Br(),
+          dcc.Slider(
+          min=0,
+          max=400,
+          value=0,
+          step=1,
+          id = "Blur_", marks = {0: '0', 200:'Blur', 400:'+400'}
+        )
+        ,
+        html.Br(),
+          dcc.Slider(
+          min=-100,
+          max=100,
+          value=0,
+          step=1,
+          id = "blursharpen_amount_",  marks = {-100: '-100', 100:'100', 0: 'Blur-sharpen Amount'}
+        )
+        ,
+        html.Br(),
+          dcc.Slider(
+          min=0,
+          max=500,
+          value=0,
+          step=1,
+          id = "image_denoise_power_",  marks = {0: '0', 500:'500', 250: 'Image Denoise Power'}
+        )
+        ,   
+        html.Br(),
+          dcc.Slider(
+          min=0,
+          max=100,
+          value=0,
+          step=1,
+          id = "color_degrade_power_",  marks = {0: '0', 100:'100', 50: 'Color Degrade Power'}
+        )])]
+        
+        Convert_Tab =  html.Div([dbc.Card(
+            [   
+               
+                #.CardHeader(dbc.InputGroup(
+                #        [dbc.InputGroupAddon("Model", addon_type="prepend"), dbc.Select(id = 'convert_model_id', options = option_convert, value = '0'), 
+                #        dbc.Button(outline=True, id = 'convert_model_continue', active=False, disabled = False, color="success", className="fas fa-check-circle")
+                #, dbc.Button(outline=True, id = 'refresh_img', active=False, disabled = convert_disabled, color="primary", className="fas fa-redo"), 
+                #dbc.Button(outline=True, id = 'okay_merge', active=False, disabled = convert_disabled, color="danger", className="fas fa-sign-in-alt")], 
+                #        size="sm",
+                #    )),
+            # 
+            #    html.Div(id = 'convert_result', style = {'text-align' : 'center'}),
+             #   html.Div(id = 'convert_load', style = {'text-align' : 'center'}),
+             #   html.Hr(),
+                
+                dbc.CardImg(top=True, id = 'Convert_Image'),
+                
+                #dbc.Progress(id = 'merge_progress'),
+                
+                dcc.Loading(html.Div(id = 'test_div'), type = 'dot'),
+                
+                #dcc.Loading(html.Div('  ', id = 'test_div'), type = 'circle'),
+                
+                
+                
+            #dbc.Tooltip('Choose Workspace', target="convert_model_continue"),
+            #dbc.Tooltip('Refresh Preview Image', target="refresh_img"),
+            #dbc.Tooltip('Convert', target="okay_merge"),
+
+            
+           
+    
+            dbc.Tabs(
+                    [
+                        dbc.Tab(basic_Set, label="Basic", tab_id="Basic-1"),
+                        dbc.Tab(adv_set, label="Advanced", tab_id="Advanced-1"),
+                        
+
+               
+                    ],
+                    id="settings_tabs",
+                    active_tab="Basic-1",
+                ),
+                
+                
+        html.Br(),    
+        
+        #dbc.Row([dbc.Col(src_child_), dbc.Col(dst_child_)], justify = 'center')
+         html.Div(dbc.ButtonGroup(
+                [dbc.Button(outline=True, id = 'v_plus_size', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-plus-circle"),
+                dbc.Button(outline=True, id = 'h_minus_size', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-minus-circle"),
+                dbc.Button(outline=True, id = 'h_plus_size', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-plus-circle"),
+                dbc.Button(outline=True, id = 'v_minus_size', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-minus-circle"),
+                dbc.Button(outline=True, id = 'v_plus_shift', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-chevron-circle-up"),
+                dbc.Button(outline=True, id = 'h_minus_shift', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-chevron-circle-left"),    
+                dbc.Button(outline=True, id = 'h_plus_shift', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-chevron-circle-right"),
+                dbc.Button(outline=True, id = 'v_minus_shift', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-chevron-circle-down"),
+                
+                dbc.Button(outline=True, id = 'refresh_img', active=False, disabled = convert_disabled, color="primary", className="fas fa-redo"),
+
+                    dbc.Button(outline=True, id = 'okay_merge', active=False, disabled = convert_disabled, color="success", className="fas fa-sign-in-alt")]), style = {'margin-left':'5%'}) ,
+    
+            
+             dbc.Tooltip('Stretch face vertically', target="v_plus_size"),
+                    dbc.Tooltip('Shrink face horizontally', target="h_minus_size"),
+                    dbc.Tooltip('Stretch face horizontally', target="h_plus_size"),
+                    dbc.Tooltip('Shrink face vertically', target="v_minus_size"),       
+                    
+                    dbc.Tooltip('Move face upward', target="v_plus_shift"),
+                    dbc.Tooltip('Move face to the left', target="h_minus_shift"),
+                    dbc.Tooltip('Move face to the right', target="h_plus_shift"),
+                    dbc.Tooltip('Move face downward', target="v_minus_shift"),
+                    dbc.Tooltip('Refresh Image', target="refresh_img"),
+                    dbc.Tooltip('Save Settings', target="okay_merge"),
+                    
+                    
+                ],
+               
+            ),
+
+
+
+
+
+
+
+
+
+
+
+
+       ])
+       
+
+
+
+
+        final_convert = dbc.Jumbotron(
+    [
+        dbc.Container(
+            [
+                html.Br(),
+                #html.H2("Convert & Download", className="display-3"),
+                html.P(
+                    "The conversion process will take some time. ", className="lead",
+                ),
+                dbc.Button('Convert', id = 'convert_start', active=True, color="primary"),
+                html.Div(id = 'convert_result', style = {'text-align' : 'center'}),
+                
+                dbc.Progress(id = 'merge_progress')
+            ],
+            fluid=True,
+        )
+    ],
+    fluid=True,
+)
+        
+        
+        
+        
+        
+        right_frame = dbc.Tabs(
+                    [
+                        dbc.Tab(Preview_vid, label="Preview", tab_id="Preview_vid"),
+                        dbc.Tab(Convert_Tab, label="Settings", tab_id="Convert_Tab"),
+                        dbc.Tab(final_convert, label="Convert", tab_id="final_Tab"),
+               
+                    ],
+                    id="convert_tabs_1",
+                    active_tab="Preview_vid",
+                ),
+        
+        #dbc.Row([dbc.Col(html.Button('Button 1', id='btn-nclicks-1')), dbc.Col(html.Button('Button 2', id='btn-nclicks-2'))], justify = 'center')
+        
+        #dbc.ButtonGroup(
+        #            [dbc.Button(outline=True, id = 'convert_settings', active=False, disabled = False, color="success", className="fas fa-hourglass-start"),
+
+        #dbc.Button('Convert', id = 'convert_', active=False, disabled = False, color="danger")],
+        #           
+        #            className="mr-1",  style = {'text-align' : 'center'}),
+        
+        
+        
+                   
 
         #Images = loading([
         #dbc.Tabs(
@@ -1234,12 +1562,13 @@ try:
                     className="mr-1"),
                     
                 html.Hr(className="my-2"),
-                dbc.Row([dbc.Toast(Progress, id="toggle-add-Progress",header="Getting Started",is_open=True,icon="primary",dismissable=True,  style={"maxWidth": "500px"}),
-                dbc.Toast(Preview_vid, id="toggle-add-Preview_vid",header="Preview"+sec_s,is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "450px"})],
-                    align="center",       
-                    
-                ),
                 
+                
+                
+                dbc.Toast([dbc.Row([dbc.Col(Progress), dbc.Col(right_frame)])], id="toggle-add-Progress",header="Getting Started",is_open=True,icon="primary",dismissable=True,  style={"maxWidth": "1000px"}),
+                #dbc.Toast(Preview_vid, id="toggle-add-Preview_vid",header="Preview"+sec_s,is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "450px"}),
+            
+           
                
                 #dbc.Toast(Images, id="toggle-add-Images",header="Generated Images",is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "800px"}),
                 dbc.Toast(Settings, id="toggle-add-Settings",header="Edit configuration file",is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "800px"}),
@@ -1425,238 +1754,6 @@ try:
                       
                 )
         #########print (len(npy_files))
-        if len(npy_files)>0:
-            convert_disabled = False
-            
-        else:
-            convert_disabled = True
-            
-        
-        size_layout  = dbc.Card(
-            dbc.CardBody(
-            
-            
-                [   dbc.Row(daq.Slider(min=0,max=50,value=10,step=1, id = "size_step", size = 150)),
-                
-                    html.Hr(),
-                 
-                    dbc.Row(dbc.Button(outline=True, id = 'v_plus_size', active=False, disabled = convert_disabled, color="success", className="fas fa-plus-circle"),justify="center",),
-                 
-                    dbc.Row([dbc.Col(dbc.Button(outline=True, id = 'h_minus_size', active=False, disabled = convert_disabled, color="success", className="fas fa-minus-circle")),  dbc.Col(dbc.Button(outline=True, id = 'h_plus_size', active=False, disabled = convert_disabled, color="success", className="fas fa-plus-circle"))]),
-              
-                    dbc.Row(dbc.Button(outline=True, id = 'v_minus_size', active=False, disabled = convert_disabled, color="success", className="fas fa-minus-circle"), justify="center"),
-                    
-                    dbc.Tooltip('Stretch face vertically', target="v_plus_size"),
-                    dbc.Tooltip('Shrink face horizontally', target="h_minus_size"),
-                    dbc.Tooltip('Stretch face horizontally', target="h_plus_size"),
-                    dbc.Tooltip('Shrink face vertically', target="v_minus_size"),
-                ]
-            ),
-            style={"width": "10rem"},
-        )
-
-
-
-        shift_layout = dbc.Card(
-            dbc.CardBody(
-                [   dbc.Row(daq.Slider(min=0,max=50,value=10,step=1, id = "shift_step", size = 150)),
-                    
-                    html.Hr(),
-                    
-                    dbc.Row(dbc.Button(outline=True, id = 'v_plus_shift', active=False, disabled = convert_disabled, color="success", className="fas fa-chevron-circle-up"),justify="center",),
-                 
-                    dbc.Row([dbc.Col(dbc.Button(outline=True, id = 'h_minus_shift', active=False, disabled = convert_disabled, color="success", className="fas fa-chevron-circle-left")),  dbc.Col(dbc.Button(outline=True, id = 'h_plus_shift', active=False, disabled = convert_disabled, color="success", className="fas fa-chevron-circle-right"))]),
-              
-                    dbc.Row(dbc.Button(outline=True, id = 'v_minus_shift', active=False, disabled = convert_disabled, color="success", className="fas fa-chevron-circle-down"), justify="center"),
-                    
-                    dbc.Tooltip('move face upward', target="v_plus_shift"),
-                    dbc.Tooltip('move face to the left', target="h_minus_shift"),
-                    dbc.Tooltip('move face to the right', target="h_plus_shift"),
-                    dbc.Tooltip('move face downward', target="v_minus_shift"),
-                ]
-            ),
-            style={"width": "10rem"},
-        )
-        
-        global option_convert  
-        option_convert = [{"label": '(1) Current Workspace', "value" : 0}, {"label": '(2) Load Workspace', "value" : 1, 'disabled': True}]
-
-        for j,idx in enumerate([i for i in os.listdir(drive_path_) if i.startswith('workspace')]):
-
-            option_convert.append({"label": ' ' + idx + ' [' + str(os.path.getsize(os.path.join(drive_path_,idx)) >> 20) +' MB]', "value" : j+2} )
-
-
-
-        Convert_Tab =  dbc.Row([dbc.Card(
-            [   
-               
-                dbc.CardHeader(dbc.InputGroup(
-                        [dbc.InputGroupAddon("Model", addon_type="prepend"), dbc.Select(id = 'convert_model_id', options = option_convert, value = '0'), 
-                        dbc.Button(outline=True, id = 'convert_model_continue', active=False, disabled = False, color="success", className="fas fa-check-circle")
-                , dbc.Button(outline=True, id = 'refresh_img', active=False, disabled = convert_disabled, color="primary", className="fas fa-redo"), 
-                dbc.Button(outline=True, id = 'okay_merge', active=False, disabled = convert_disabled, color="danger", className="fas fa-sign-in-alt")], 
-                        size="sm",
-                    )),
-             
-                html.Div(id = 'convert_result', style = {'text-align' : 'center'}),
-                html.Div(id = 'convert_load', style = {'text-align' : 'center'}),
-                html.Hr(),
-                
-                dbc.CardImg(top=True, id = 'Convert_Image'),
-                
-                dbc.Progress(id = 'merge_progress'),
-                
-                dcc.Loading(html.Div(id = 'test_div'), type = 'dot'),
-                
-                #dcc.Loading(html.Div('  ', id = 'test_div'), type = 'circle'),
-                
-                
-                
-            dbc.Tooltip('Choose Workspace', target="convert_model_continue"),
-            dbc.Tooltip('Refresh Preview Image', target="refresh_img"),
-            dbc.Tooltip('Convert', target="okay_merge"),
-
-            
-        dbc.Card(
-            dbc.CardBody([dcc.Slider(
-          min=0,
-          max=100,
-          value=0,
-          step=1,
-          id = "motion_blur_power_", marks = {0: '0', 100:'100', 50: 'Motion Blur Power'}
-        ),
-        
-        html.Br(),
-        dcc.Slider(
-          min=-400,
-          max=400,
-          value=0,
-          step=1,
-          id = "Erode_" , marks = {-400: '-400', 0:'Erode', 400:'+400'}
-        )
-        ,
-        html.Br(),
-          dcc.Slider(
-          min=0,
-          max=400,
-          value=0,
-          step=1,
-          id = "Blur_", marks = {0: '0', 200:'Blur', 400:'+400'}
-        )
-        ,
-        html.Br(),
-          dcc.Slider(
-          min=-100,
-          max=100,
-          value=0,
-          step=1,
-          id = "blursharpen_amount_",  marks = {-100: '-100', 100:'100', 0: 'Blur-sharpen Amount'}
-        )
-        ,
-        html.Br(),
-          dcc.Slider(
-          min=0,
-          max=500,
-          value=0,
-          step=1,
-          id = "image_denoise_power_",  marks = {0: '0', 500:'500', 250: 'Image Denoise Power'}
-        )
-        ,   
-        html.Br(),
-          dcc.Slider(
-          min=0,
-          max=100,
-          value=0,
-          step=1,
-          id = "color_degrade_power_",  marks = {0: '0', 100:'100', 50: 'Color Degrade Power'}
-        )])),
-            ],
-            style={"width": "800px"}, 
-        ),
-
-
-
-
-
-
-
-
-
-
-
-
-        dbc.Toast([
-        
-        dbc.InputGroup([dbc.InputGroupAddon("Face type", addon_type="prepend"),dbc.Select(id = 'face_type_', options = [{'label':'Head', "value" :0},
-        {'label':'Face', "value" :1}, 
-        {'label':'Full Face', "value" :2}, 
-        ], value = '0')], size="sm"),
-        
-        dbc.InputGroup([dbc.InputGroupAddon("Mask type", addon_type="prepend"),dbc.Select(id = 'mask_mode_', options = [{'label':'dst', "value" :1},
-        {'label':'learned-prd', "value" :2}, 
-        {'label':'learned-dst', "value" :3}, 
-        {'label':'learned-prd*learned-dst', "value" :4}, 
-        {'label':'learned-prd+learned-dst', "value" :5},  
-        {'label':'XSeg-prd', "value" :6}, 
-        {'label':'XSeg-dst', "value" :7},  
-        {'label':'XSeg-prd*XSeg-dst', "value" :8}, 
-        {'label':'learned-prd*learned-dst*XSeg-prd*XSeg-dst', "value" :9}], value = 3),], size="sm",),
-        
-        dbc.InputGroup([dbc.InputGroupAddon("Mode", addon_type="prepend"),dbc.Select(id = 'mode_', options = [{'label':'original', "value" :'original'},
-        {'label':'overlay', "value" :'overlay'}, 
-        {'label':'hist-match', "value" :'hist-match'}, 
-        {'label':'seamless', "value" :'seamless'}, 
-        {'label':'seamless-hist-match', "value" :'seamless-hist-match'},  
-        {'label':'raw-rgb', "value" :'raw-rgb'}, 
-        {'label':'raw-predict', "value" :'raw-predict'}], value = 'overlay') ], size="sm",)
-        
-        ,dbc.InputGroup([dbc.InputGroupAddon("Color mode", addon_type="prepend"),dbc.Select(id = 'color_mode_', options = [{'label':'None', "value" :0},
-        {'label':'rct', "value" :1}, 
-        {'label':'lct', "value" :2}, 
-        {'label':'mkl', "value" :3}, 
-        {'label':'mkl-m', "value" :4},  
-        {'label':'idt', "value" :5}, 
-        {'label':'idt-m', "value" :6},  
-        {'label':'sot-m', "value" :7}, 
-        {'label':'mix-m', "value" :8}], value = '0')], size="sm"),
-    dbc.CardBody( 
-                    
-                    dbc.InputGroup(
-                        [
-                        
-                        #dbc.Button(outline=True, id = 'mask_mode', active=False, disabled = convert_disabled, color="primary", className="fas fa-theater-masks"),
-                        #dbc.Button(outline=True, id = 'mode', active=False, disabled = convert_disabled, color="primary", className="fas fa-cogs"),
-                        #dbc.Button(outline=True, id = 'scale_face', active=False, disabled = convert_disabled, color="primary", className="fas fa-arrows-alt"),
-
-                        #dbc.Button(outline=True, id = 'erode_mask_modifier', active=False, disabled = convert_disabled, color="primary", className="fas fa-crop-alt"),
-                        #dbc.Button(outline=True, id = 'color_mode', active=False, disabled = convert_disabled, color="primary", className="fas fa-palette"),
-                        #dbc.Button(outline=True, id = 'adv_settings', active=False, disabled = convert_disabled, color="primary", className="fas fa-sliders-h"),
-                      
-                        dbc.Row([size_layout, shift_layout]),
-                        
-                        ], 
-                      
-                    ),
-                  
-                    
-
-                
-                ),
-        
-        
-    ], id="Settings_toggle_",header="Advanced Settings",is_open=True,icon="primary",dismissable=False, style={"maxWidth": "200px"})]),
-        
-       
-
-
-
-
-        
-        
-        
-        
-        
-        
         
         
         
@@ -1666,7 +1763,7 @@ try:
                     [
                         dbc.Tab(Upload_Tab, label="Upload", tab_id="tab-1"),
                         dbc.Tab(Training_Tab, label="Train/Resume", tab_id="tab-2"),
-                        dbc.Tab(Convert_Tab, label="Convert", tab_id="tab-3"),
+                       # dbc.Tab(Convert_Tab, label="Convert", tab_id="tab-3"),
                     ],
                     id="tabs",
                     active_tab="tab-1",
@@ -2048,8 +2145,8 @@ try:
                 f.close()
             
             #########print (pids)
-            
-            shutdown() 
+            killall()
+            #shutdown() 
                 
             return  [ True, str(video_index()), str(duration()) + 's']
           
@@ -2843,7 +2940,7 @@ try:
                 img3 = base64.b64encode(img3)
                 src3 = 'data:image/jpg;base64,{}'.format(img3.decode())
                 
-                img4 = cv2.resize(255 - img1[:100], (1280,200))
+                img4 = cv2.resize(255 - img1[:100], (1280,350))
                 ret, img4 = cv2.imencode('.jpg', img4)
                 
                 #p = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
@@ -3362,167 +3459,6 @@ try:
 
         
         
-        @app.callback([Output('v_plus_size', 'disabled'),
-                       Output('h_minus_size', 'disabled'),
-                       Output('h_plus_size', 'disabled'),
-                       Output('v_minus_size', 'disabled'),
-                       Output('v_plus_shift', 'disabled'),
-                       Output('h_minus_shift', 'disabled'),
-                       Output('h_plus_shift', 'disabled'),
-                       Output('v_minus_shift', 'disabled'),
-                 
-                       Output('okay_merge', 'disabled'),
-
-                       Output('refresh_img', 'disabled'),
-                    
-                       Output('mask_mode_', 'disabled'),
-                       Output('face_type_', 'disabled'),
-                       Output('mode_', 'disabled'),
-                       
-                       Output('Erode_', 'disabled'),
-                       Output('Blur_', 'disabled'),
-                       Output('color_mode_', 'disabled'),
-                       Output('motion_blur_power_', 'disabled'),
-                       Output('blursharpen_amount_', 'disabled'),
-                       Output('image_denoise_power_', 'disabled'),
-                       Output('color_degrade_power_', 'disabled'),
-                       Output('convert_load', 'children')],
-                       [Input('interval-1', 'n_intervals')],
-                       [State('convert_model_continue', 'n_clicks')]
-                       )
-                       
-        def update_disabled(intval, n):
-        
-        
-            npy_files = [i for i in os.listdir('/tmp') if i.endswith('.npy')]
-        
-                
-            
-            
-            if len(npy_files)>5:
-            
-                isdisabled = False
-                
-                
-            else:
-            
-                isdisabled = True
-                
-        
-            if n:
-            
-                if len(npy_files)>5:
-                
-                    msg = ""
-                    
-                else:
-                
-                    msg =  [html.Br(), "Loading. Please wait. ", dbc.Spinner(size="sm")]   
-        
-        
-        
-        
-            else:
-                
-                msg = ""
-                
-                
-            
-            
-            
-            return [isdisabled]*20 + [msg]
-            
-            
-        @app.callback([Output('convert_model_continue', 'disabled'),
-                       Output('convert_model_id', 'disabled'),
-                       
-                      
-                      ],
-                       [Input('convert_model_continue', 'n_clicks')],
-                       [State('convert_model_id', 'value')])
-            
-            
-        def update_convert(n, model_id):
-        
-            global option_convert
-            global npy_files
-            
-            if n:
-                
-                if model_id == '0':
-                
-                    check = len(os.listdir('/content/workspace/model/'))>5 
-                    
-                    if check:
-                        
-                        os.system('echo | python DeepFaceLab/merger/Merger_preview.py')
-                        
-                        #########print ('dfggadgsg')
-                        
-                        #npy_files = [i for i in os.listdir('/tmp') if i.endswith('.npy')]
-                        
-                        #npy_ = npy_files[0]
-                        
-                        #img = Merger_tune.MergeMaskedFace_test(npy_, cfg)[0]
-                        
-                        return [True, True]
-                        
-                    else:
-                        
-                        return [False, False]
-                        
-                        
-                else:
-                
-                    model = [i['label'] for i in option_convert if i['value'] == int(model_id)][0]
-                    convert_id = model.split('_')[-1].split('.')[0]
-                    model_name = 'workspace_'+convert_id + '.zip'
-                
-                    if os.path.isdir('/content/workspace/'):
-                        shutil.rmtree('/content/workspace/')  
-
-                    print ('Extracting files... ')
-                    import zipfile
-                    zf = zipfile.ZipFile(os.path.join(drive_path_,model_name))
-
-                    uncompress_size = sum((file.file_size for file in zf.infolist()))
-
-                    extracted_size = 0
-                    
-                    for file in tqdm.tqdm(zf.infolist()):
-                        extracted_size += file.file_size
-                        zf.extract(file)
-                    
-                    
-                    check = len(os.listdir('/content/workspace/model/'))>5 
-                    
-                    if check:
-                        
-                        os.system('echo | python DeepFaceLab/merger/Merger_preview.py')
-                        
-                        #########print ('dfggadgsg')
-                        
-                        
-                        
-                        #npy_files = [i for i in os.listdir('/tmp') if i.endswith('.npy')]
-                        
-                        #npy_ = npy_files[0]
-                        
-                        #img = Merger_tune.MergeMaskedFace_test(npy_, cfg)[0]
-                        
-                        
-                        return [True, True]
-                        
-                    else:
-                        
-                        return [False, False]
-                        
-                        
-            else:
-                
-                return [False, False]    
-            
-            
             
         @app.callback([Output('Convert_Image', 'src'), Output('test_div', 'children')],
                        [
@@ -3547,18 +3483,18 @@ try:
                        Input('blursharpen_amount_', 'value'),
                        Input('image_denoise_power_', 'value'),
                        Input('color_degrade_power_', 'value'),
-                       Input('convert_model_continue', 'disabled')
-               ], [State('size_step', 'value'),
-                    State('shift_step', 'value')]
+                       Input('okay_merge', 'n_clicks')
+               ],# [State('size_step', 'value'),
+                 #   State('shift_step', 'value')]
                        )    
                        
-        def update_convert_image(v_plus_size,h_minus_size, h_plus_size, v_minus_size , v_plus_shift, h_minus_shift, h_plus_shift, v_minus_shift,
-                                refresh_img, mask_mode_, face_type_, mode_, Erode_,Blur_ ,color_mode_, motion_blur_power_, blursharpen_amount_,
-                                image_denoise_power_,color_degrade_power_, trigger,stp_size, stp_shift):
+        def update_convert_image(v_plus_size,h_minus_size, h_plus_size, v_minus_size , v_plus_shift, h_minus_shift, h_plus_shift, v_minus_shift, refresh_img,
+                                 mask_mode_, face_type_, mode_, Erode_,Blur_ ,color_mode_, motion_blur_power_, blursharpen_amount_,
+                                image_denoise_power_,color_degrade_power_,okay_merge):
 
             
             trigger_id = dash.callback_context.triggered[0]['prop_id']
-
+            stp_size, stp_shift = 10,10
 
             #########print (v_plus_size,h_minus_size, h_plus_size, v_minus_size , v_plus_shift, h_minus_shift, h_plus_shift, v_minus_shift,
          
@@ -3611,7 +3547,7 @@ try:
             
             if trigger_id == 'refresh_img.n_clicks':
             
-                ind_preview = np.random.choice(20)
+                ind_preview = np.random.choice(len(npy_files))
             
             
             
@@ -3628,52 +3564,92 @@ try:
             
                 face_type = FaceType.WHOLE_FACE
                 
-            try:
             
-                npy_ = os.path.join('/tmp', npy_files[ind_preview])
+        
+            npy_ = os.path.join('/tmp', npy_files[ind_preview])
+        
             
+            ##########print (npy_)
+            
+            cfg_merge = merging_vars(
+                   face_type = face_type,
+                   mask_mode = int(mask_mode_),
+                   mode = mode_,
+                   erode_mask_modifier = Erode_,
+                   blur_mask_modifier = Blur_,
+                   color_transfer_mode = int(color_mode_),
+                   masked_hist_match = True,
+                   hist_match_threshold = 255,
+                   motion_blur_power = motion_blur_power_,
+                   blursharpen_amount = blursharpen_amount_,
+                   image_denoise_power = image_denoise_power_,
+                   bicubic_degrade_power = 0,
+                   sharpen_mode = 1,
+                   color_degrade_power = color_degrade_power_,
+                   horizontal_shear = horizontal_shear,
+                   vertical_shear = vertical_shear,
+                   horizontal_shift = horizontal_shift,
+                   vertical_shift = vertical_shift
+                   )
+                   
+                   
+            result, _ = Merger_tune.MergeMaskedFace_test(npy_, cfg_merge)
+            
+            
+            
+            if trigger_id == 'okay_merge.n_clicks':
+            
+                dict_1 = {'original':0, 'overlay':1, 'hist-match':2 ,'seamless':3 ,'seamless-hist-match':4 , 'raw-rgb':5 , 'raw-predict':6}
                 
-                ##########print (npy_)
+                dict_2 = {0: 'None', 1:'rct',2:'lct',3:'mkl',4:'mkl-m',5:'idt',6:'idt-m',7:'sot-m',8:'mix-m'}
                 
-                cfg_merge = merging_vars(
-                       face_type = face_type,
-                       mask_mode = int(mask_mode_),
-                       mode = mode_,
-                       erode_mask_modifier = Erode_,
-                       blur_mask_modifier = Blur_,
-                       color_transfer_mode = int(color_mode_),
-                       masked_hist_match = True,
-                       hist_match_threshold = 255,
-                       motion_blur_power = motion_blur_power_,
-                       blursharpen_amount = blursharpen_amount_,
-                       image_denoise_power = image_denoise_power_,
-                       bicubic_degrade_power = 0,
-                       sharpen_mode = 1,
-                       color_degrade_power = color_degrade_power_,
-                       horizontal_shear = horizontal_shear,
-                       vertical_shear = vertical_shear,
-                       horizontal_shift = horizontal_shift,
-                       vertical_shift = vertical_shift
-                       )
-                       
-                       
-                result, _ = Merger_tune.MergeMaskedFace_test(npy_, cfg_merge)
-                result = imutils.resize(result*255, height=512)
-                
-                #########print (result.shape)
-                
-                ret, frame = cv2.imencode('.png',result )
+                with open('/content/DeepFaceLab/settings.py', 'a') as f:
 
-                frame = base64.b64encode(frame)
+                    f.write("\nmerging_mode = "+ str(dict_1[cfg_merge.mode]))
+                    f.write("\nmask_merging_mode = " + str(cfg_merge.mask_mode))
+                    f.write("\nblursharpen_amount = " + str(cfg_merge.blursharpen_amount))
+                    f.write("\nerode_mask_modifier = "+ str(cfg_merge.erode_mask_modifier))
+                    f.write("\nblur_mask_modifier ="+ str(cfg_merge.blur_mask_modifier))
+                    f.write("\nmotion_blur_power = "+ str(cfg_merge.motion_blur_power))
+                    #f.write("\noutput_face_scale = "+ cfg_merge)
 
-                src = 'data:image/png;base64,{}'.format(frame.decode())
+                    if cfg_merge.color_transfer_mode == 0:
+
+                      f.write("\ncolor_transfer_mode = None")
+
+                    else:
+
+                      f.write("\ncolor_transfer_mode = '"+ dict_2[cfg_merge.color_transfer_mode]+"'")
+
+                    #f.write("\nsuper_resolution_power = "+ cfg_merge)
+                    f.write("\nimage_denoise_power = "+ str(cfg_merge.image_denoise_power))
+                    #f.write("\nbicubic_degrade_power = "+ cfg_merge)
+                    f.write("\ncolor_degrade_power = "+ str(cfg_merge.color_degrade_power))
+                    #f.write("\nmasked_hist_match = "+ cfg_merge)
+                    #f.write("\nhist_match_threshold ="+cfg_merge)
+                    f.write("\nhorizontal_shear = "+str(cfg_merge.horizontal_shear))
+                    f.write("\nvertical_shear = "+ str(cfg_merge.vertical_shear))
+                    f.write("\nhorizontal_shift = "+ str(cfg_merge.horizontal_shift))
+                    f.write("\nvertical_shift = "+ str(cfg_merge.vertical_shift))
+                    
+                    f.close()
                 
-                return [src, ' ']
             
+            result = imutils.resize(result*255, height=512)
             
-            except:
+            #########print (result.shape)
             
-                return ["", ' ']
+            ret, frame = cv2.imencode('.png',result )
+
+            frame = base64.b64encode(frame)
+
+            src = 'data:image/png;base64,{}'.format(frame.decode())
+            
+            return [src, ' ']
+        
+        
+         
+           
                 
         @app.callback([Output('preview_progress', 'value'),Output('video-player', 'url'), Output('toggle-add-Preview_vid', 'header')],
                     [Input('interval-1', 'n_intervals')])
@@ -3720,9 +3696,9 @@ try:
                 return [dash.no_update,dash.no_update,dash.no_update]
                     
         @app.callback([Output('merge_progress', 'value'),Output('convert_result', 'children')],
-                    [Input('okay_merge', 'n_clicks'), Input('interval-1', 'n_intervals')])
-                    
-              
+                [Input('convert_start', 'n_clicks'), Input('interval-1', 'n_intervals')])
+                
+          
         def update__(n, interval):
         
             trigger_id = dash.callback_context.triggered[0]['prop_id']
@@ -3734,7 +3710,9 @@ try:
             
                 convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
                 
-            if n and trigger_id=='okay_merge.n_clicks':
+            if n and trigger_id=='convert_start.n_clicks':
+            
+                killall()
             
                 if os.path.isdir('/content/workspace/data_dst/merged'):
                     shutil.rmtree('/content/workspace/data_dst/merged')
@@ -3790,29 +3768,19 @@ try:
                 
                 number_of_files = len(os.listdir('/content/workspace/data_dst/merged'))
                 total_number_of_files = len(os.listdir('/content/workspace/data_dst/'))-2 
-                total_number_of_files = len(os.listdir('/content/workspace/data_dst/'))-2 
                 
                 done =  int((number_of_files/total_number_of_files)*100)
             
-                #print ('/content/drive/My Drive/result_' + convert_id + '.mp4')
-                
-                if os.path.isfile(os.path.join(drive_path_,'result_' + convert_id + '.mp4')):
+            
+                if os.path.isfile('/content/drive/My Drive/result_' + convert_id + '.mp4'):
 
                     #time.sleep(10)
-                    #print ('tgb')
-                    fid = getoutput("xattr -p 'user.drive.id' '"+drive_path_+"'result_'"+convert_id+"'.mp4'")
-                    
-                    if len(fid)>30:
-                    
-                        url = 'https://docs.google.com/file/d/'+fid
+                
+                    fid = getoutput("xattr -p 'user.drive.id' '/content/drive/My Drive/result_'"+convert_id+"'.mp4'")
+                    url = 'https://docs.google.com/file/d/'+fid
 
                 
-                        done_ = [html.Br(), "Completed. ", html.A('Download here', href = url)]
-                        done = 100
-                        
-                    else:
-                    
-                        done_ =  [html.Br(), "Converting frames ", dbc.Spinner(size="sm")]  
+                    done_ = [html.Br(), "Completed. ", html.A('Download here', href = url)]
                 
                 else:
                     done_ =  [html.Br(), "Converting frames ", dbc.Spinner(size="sm")]   
@@ -3826,4 +3794,4 @@ try:
         
 except KeyboardInterrupt:
     
-    os.system('sudo fuser -k /dev/nvidia-uvm')
+    killall()

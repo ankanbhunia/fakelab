@@ -52,7 +52,7 @@ def MergeMaskedFace_test(path, cfg):
   
     data = np.load(path, allow_pickle=True)
 
-    [img_bgr, predictor_input_shape, frame_info, img_face_landmarks, prd_face_bgr, prd_face_mask_a_0, prd_face_dst_mask_a_0, prd_face_xseg_bgr, dst_face_xseg_mask, img_bgr_uint8] = data
+    [img_bgr, predictor_input_shape, frame_info, img_face_landmarks, prd_face_bgr, prd_face_mask_a_0, prd_face_dst_mask_a_0, img_bgr_uint8] = data
 
     
     img_size = img_bgr.shape[1], img_bgr.shape[0]
@@ -93,18 +93,8 @@ def MergeMaskedFace_test(path, cfg):
     elif cfg.mask_mode == 5: #learned-prd+learned-dst
         wrk_face_mask_a_0 = np.clip( prd_face_mask_a_0+prd_face_dst_mask_a_0, 0, 1)
     elif cfg.mask_mode >= 6 and cfg.mask_mode <= 9:  #XSeg modes
-        if cfg.mask_mode == 6 or cfg.mask_mode == 8 or cfg.mask_mode == 9:
-            # obtain XSeg-prd
-            #prd_face_xseg_bgr = cv2.resize (prd_face_bgr, (xseg_input_size,)*2, interpolation=cv2.INTER_CUBIC)
-            #prd_face_xseg_mask = xseg_256_extract_func(prd_face_xseg_bgr)
-            X_prd_face_mask_a_0 = cv2.resize ( prd_face_xseg_mask, (output_size, output_size), interpolation=cv2.INTER_CUBIC)
 
-        if cfg.mask_mode >= 7 and cfg.mask_mode <= 9:
-            # obtain XSeg-dst
-            #xseg_mat            = LandmarksProcessor.get_transform_mat (img_face_landmarks, xseg_input_size, face_type=cfg.face_type)
-            #dst_face_xseg_bgr   = cv2.warpAffine(img_bgr, xseg_mat, (xseg_input_size,)*2, flags=cv2.INTER_CUBIC )
-            #dst_face_xseg_mask  = xseg_256_extract_func(dst_face_xseg_bgr)
-            X_dst_face_mask_a_0 = cv2.resize (dst_face_xseg_mask, (output_size,output_size), interpolation=cv2.INTER_CUBIC)
+
 
         if cfg.mask_mode == 6:   #'XSeg-prd'
             wrk_face_mask_a_0 = X_prd_face_mask_a_0
