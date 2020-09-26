@@ -35,7 +35,7 @@ try:
         from IPython.display import HTML
         from IPython.display import HTML
         from google.colab import drive
-        import random
+        import randomass
         import string
         from multiprocessing import Process, Queue
         global thread_list

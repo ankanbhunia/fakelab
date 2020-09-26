@@ -48,11 +48,11 @@ ipy = get_ipython()
 ipy.magic("tensorflow_version 1.x")
 
 clear_output()
-import tensorflow as tf
+#import tensorflow as tf
 
-if not tf.test.is_gpu_available():
-  print ('Please use GPU to run the program.')
-  sys.exit(0)
+#if not tf.test.is_gpu_available():
+#  print ('Please use GPU to run the program.')
+#  sys.exit(0)
   
 
 GPU = get_ipython().getoutput("nvidia-smi --query-gpu=name --format=csv,noheader")
