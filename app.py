@@ -35,7 +35,7 @@ try:
         from IPython.display import HTML
         from IPython.display import HTML
         from google.colab import drive
-        import randomass
+        import random
         import string
         from multiprocessing import Process, Queue
         global thread_list
@@ -1194,7 +1194,7 @@ try:
             #url='http://media.w3.org/2010/05/bunny/movie.mp4',
             url = url,
             controls=True, loop = True, playing = True, width='100%', height='100%', 
-        ), dbc.Progress(id = 'preview_progress', style={"height": "3px"})
+        ), dbc.Progress(id = 'preview_progress', style={"height": "6px"})
         
         
         
@@ -1377,12 +1377,21 @@ try:
             #    html.Div(id = 'convert_result', style = {'text-align' : 'center'}),
              #   html.Div(id = 'convert_load', style = {'text-align' : 'center'}),
              #   html.Hr(),
+             
+             
+             loading([html.Div(dbc.ButtonGroup(
+                    [
+                    dbc.Button( id = 'refresh_img', active=False, disabled = convert_disabled, color="light", size = 'sm', className="fas fa-redo"),
+                    
+
+                        dbc.Button( id = 'okay_merge', active=False, disabled = convert_disabled, color="light", size = 'sm', className="fas fa-sign-in-alt")]),
+                        style = {'text-align':'center', 'margin-bottom':'-23px'}) ,
                 
                 dbc.CardImg(top=True, id = 'Convert_Image'),
                 
                 #dbc.Progress(id = 'merge_progress'),
                 
-                dcc.Loading(html.Div(id = 'test_div'), type = 'dot'),
+                #dcc.Loading(html.Div(id = 'test_div'), type = 'dot'),
                 
                 #dcc.Loading(html.Div('  ', id = 'test_div'), type = 'circle'),
                 
@@ -1392,8 +1401,17 @@ try:
             #dbc.Tooltip('Refresh Preview Image', target="refresh_img"),
             #dbc.Tooltip('Convert', target="okay_merge"),
 
-            
-           
+                
+               html.Div(dbc.ButtonGroup(
+                    [dbc.Button( id = 'v_plus_size', active=False, disabled = convert_disabled, color="light",size = 'sm', className="fas fa-plus-circle"),
+                    dbc.Button( id = 'h_minus_size', active=False, disabled = convert_disabled, color="light",size = 'sm', className="fas fa-minus-circle"),
+                    dbc.Button( id = 'h_plus_size', active=False, disabled = convert_disabled, color="light",size = 'sm', className="fas fa-plus-circle"),
+                    dbc.Button( id = 'v_minus_size', active=False, disabled = convert_disabled, color="light",size = 'sm', className="fas fa-minus-circle"),
+                    dbc.Button( id = 'v_plus_shift', active=False, disabled = convert_disabled, color="light", size = 'sm',className="fas fa-chevron-circle-up"),
+                    dbc.Button( id = 'h_minus_shift', active=False, disabled = convert_disabled, color="light",size = 'sm', className="fas fa-chevron-circle-left"),    
+                    dbc.Button( id = 'h_plus_shift', active=False, disabled = convert_disabled, color="light",size = 'sm', className="fas fa-chevron-circle-right"),
+                    dbc.Button( id = 'v_minus_shift', active=False, disabled = convert_disabled, color="light",size = 'sm',className="fas fa-chevron-circle-down"),
+                    ]), style = {'text-align':'center', 'margin-top':'-23px'})]) ,
     
             dbc.Tabs(
                     [
@@ -1408,22 +1426,10 @@ try:
                 ),
                 
                 
-        html.Br(),    
+        #html.Br(),    
         
         #dbc.Row([dbc.Col(src_child_), dbc.Col(dst_child_)], justify = 'center')
-         html.Div(dbc.ButtonGroup(
-                [dbc.Button(outline=True, id = 'v_plus_size', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-plus-circle"),
-                dbc.Button(outline=True, id = 'h_minus_size', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-minus-circle"),
-                dbc.Button(outline=True, id = 'h_plus_size', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-plus-circle"),
-                dbc.Button(outline=True, id = 'v_minus_size', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-minus-circle"),
-                dbc.Button(outline=True, id = 'v_plus_shift', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-chevron-circle-up"),
-                dbc.Button(outline=True, id = 'h_minus_shift', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-chevron-circle-left"),    
-                dbc.Button(outline=True, id = 'h_plus_shift', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-chevron-circle-right"),
-                dbc.Button(outline=True, id = 'v_minus_shift', active=False, disabled = convert_disabled, color="Secondary", className="fas fa-chevron-circle-down"),
-                
-                dbc.Button(outline=True, id = 'refresh_img', active=False, disabled = convert_disabled, color="primary", className="fas fa-redo"),
-
-                    dbc.Button(outline=True, id = 'okay_merge', active=False, disabled = convert_disabled, color="success", className="fas fa-sign-in-alt")]), style = {'margin-left':'5%'}) ,
+         
     
             
              dbc.Tooltip('Stretch face vertically', target="v_plus_size"),
@@ -1464,14 +1470,15 @@ try:
     [
         dbc.Container(
             [
-                html.Br(),
-                #html.H2("Convert & Download", className="display-3"),
-                html.P(
-                    "The conversion process will take some time. ", className="lead",
-                ),
-                dbc.Button('Convert', id = 'convert_start', active=True, color="primary"),
-                html.Div(id = 'convert_result', style = {'text-align' : 'center'}),
+                #html.P(
+                #    "The conversion process will take some time. ", className="lead",
                 
+                html.Div(html.P('The conversion process will take some time', className="lead") , style = {'text-align' : 'center'}),
+                html.Br(),
+                html.Div(dbc.Button('Convert', id = 'convert_start', active=True, color="primary"), style = {'text-align' : 'center'}),
+                
+                html.Div(id = 'convert_result', style = {'text-align' : 'center'}),
+                html.Br(),
                 dbc.Progress(id = 'merge_progress')
             ],
             fluid=True,
@@ -1530,7 +1537,7 @@ try:
         except:
             sec_s = ''
             
-        choose_face = html.Div([html.Div(id = 'all_imgs_faces'), html.Br(),
+        choose_face = html.Div([dbc.Row([dbc.Col(html.Div(id = 'all_imgs_faces'))]), html.Br(),
         
         dbc.Button('Next ', outline=True, id = 'okay_face_select', active=False, color="success",  size = 'sm',  style = {'margin-left': 'auto', 'margin-right': 'auto'}), html.Div(id = 'okay_face_select_text')])
         
@@ -1556,8 +1563,8 @@ try:
                 
                 
                 
-                dbc.Row([dbc.Col(dbc.Toast(Progress, id="toggle-add-Progress",header="Getting Started",is_open=True,icon="primary",dismissable=True,  style={"maxWidth": "500px"})),
-                dbc.Col(dbc.Toast(right_frame, id="toggle-add-right_frame",header=""+sec_s,is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "500px"}))], no_gutters=True,),
+                dbc.Row([dbc.Col(dbc.Toast(Progress, id="toggle-add-Progress",header="Getting Started",is_open=True,icon="primary",dismissable=True,  style={"maxWidth": "1000px"})),
+                dbc.Col(dbc.Toast(right_frame, id="toggle-add-right_frame",header=""+sec_s,is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "1000px"}))], no_gutters=True,),
             
 
                
@@ -3454,7 +3461,7 @@ try:
         
         
             
-        @app.callback([Output('Convert_Image', 'src'), Output('test_div', 'children')],
+        @app.callback(Output('Convert_Image', 'src'),
                        [
                        Input('v_plus_size', 'n_clicks'),
                        Input('h_minus_size', 'n_clicks'),
@@ -3629,7 +3636,7 @@ try:
                         f.close()
                     
                 
-                result = imutils.resize(result*255, height=512)
+                result = imutils.resize(result*255, height=256)
                 
                 #########print (result.shape)
                 
@@ -3639,11 +3646,11 @@ try:
 
                 src = 'data:image/png;base64,{}'.format(frame.decode())
                 
-                return [src, ' ']
+                return src
             
             except:
         
-                return ["", ' ']
+                return ""
          
            
                 
@@ -3682,11 +3689,11 @@ try:
                         return [done, os.path.join('/assets', glob.glob("/content/assets/*mp4")[0].split('/')[-1]),'Preview'+sec_s]
                     
                     else:
-                        return [done, dash.no_update, 'Preview'+sec_s]
+                        return [done, dash.no_update,sec_s]
                         
                 except:
                 
-                    return [done, dash.no_update, 'Preview'+sec_s]
+                    return [done, dash.no_update, sec_s]
                     
                     
             except:
@@ -3776,10 +3783,17 @@ try:
                     #time.sleep(10)
                 
                     fid = getoutput("xattr -p 'user.drive.id' '"+tar_di+"'")
-                    url = 'https://docs.google.com/file/d/'+fid
+                    
+                    if len(fid)>30:
+                    
+                        url = 'https://docs.google.com/file/d/'+fid
 
-                
-                    done_ = [html.Br(), "Completed. ", html.A('Download here', href = url)]
+                    
+                        done_ = [html.Br(), "Completed. ", html.A('Download here', href = url)]
+                        
+                    else:
+                    
+                        done_ =  [html.Br(), "Converting frames ", dbc.Spinner(size="sm")]   
                 
                 else:
                     done_ =  [html.Br(), "Converting frames ", dbc.Spinner(size="sm")]   
