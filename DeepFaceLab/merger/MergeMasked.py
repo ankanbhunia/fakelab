@@ -44,11 +44,12 @@ def geometric_transformation_of_mask(img_bgr, img_face, mask, H = 0, V = 0, PH =
 
   return img_bgr*(1-mask_[..., np.newaxis]) + (img_face_*mask_[..., np.newaxis])
   
-
 def MergeMaskedFace (predictor_func, predictor_input_shape,
                      face_enhancer_func,
                      xseg_256_extract_func,
                      cfg, frame_info, img_bgr_uint8, img_bgr, img_face_landmarks):
+                     
+    data = [img_bgr, predictor_input_shape, frame_info, img_face_landmarks]
 
     img_size = img_bgr.shape[1], img_bgr.shape[0]
     img_face_mask_a = LandmarksProcessor.get_image_hull_mask (img_bgr.shape, img_face_landmarks)
@@ -77,15 +78,12 @@ def MergeMaskedFace (predictor_func, predictor_input_shape,
 
     predicted = predictor_func (predictor_input_bgr)
     prd_face_bgr          = np.clip (predicted[0], 0, 1.0)
+    data.append(prd_face_bgr)
     prd_face_mask_a_0     = np.clip (predicted[1], 0, 1.0)
+    data.append(prd_face_mask_a_0)
     prd_face_dst_mask_a_0 = np.clip (predicted[2], 0, 1.0)
-    
-    
-    #print (prd_face_mask_a_0.shape)
-    #plt.imsave('prd_face_bgr.jpg', prd_face_bgr)
-    #plt.imsave('prd_face_mask_a_0.jpg', prd_face_mask_a_0)
-    #plt.imsave('prd_face_dst_mask_a_0.jpg', prd_face_dst_mask_a_0)
-    
+    data.append(prd_face_dst_mask_a_0)
+
     if cfg.super_resolution_power != 0:
         prd_face_bgr_enhanced = face_enhancer_func(prd_face_bgr, is_tanh=True, preserve_size=False)
         mod = cfg.super_resolution_power / 100.0
@@ -168,7 +166,7 @@ def MergeMaskedFace (predictor_func, predictor_input_shape,
     img_face_mask_a = cv2.warpAffine( wrk_face_mask_a_0, face_mask_output_mat, img_size, np.zeros(img_bgr.shape[0:2], dtype=np.float32), flags=cv2.WARP_INVERSE_MAP | cv2.INTER_CUBIC )[...,None]
     img_face_mask_a = np.clip (img_face_mask_a, 0.0, 1.0)
     img_face_mask_a [ img_face_mask_a < (1.0/255.0) ] = 0.0 # get rid of noise
-
+    data.append(img_bgr_uint8)
     if wrk_face_mask_a_0.shape[0] != output_size:
         wrk_face_mask_a_0 = cv2.resize (wrk_face_mask_a_0, (output_size,output_size), interpolation=cv2.INTER_CUBIC)
 
@@ -273,16 +271,8 @@ def MergeMaskedFace (predictor_func, predictor_input_shape,
                             print ("Seamless fail: " + e_str)
 
                 cfg_mp = cfg.motion_blur_power / 100.0
-                
-                #plt.imsave('img_bgr.jpg', img_bgr)
-                #plt.imsave('out_img.jpg', out_img)
-                #plt.imsave('img_face_mask_a.jpg', img_face_mask_a[:,:,0])
-                
-                #print (img_face_mask_a.shape)
-                out_img = geometric_transformation_of_mask(img_bgr, out_img, img_face_mask_a, H = settings.horizontal_shear, V = settings.vertical_shear, PH =  settings.horizontal_shift, PV = settings.vertical_shift)#img_bgr*(1-img_face_mask_a) + (out_img*img_face_mask_a)
-                
-                
-                #plt.imsave('out_img_.jpg', out_img)
+
+                out_img = img_bgr*(1-img_face_mask_a) + (out_img*img_face_mask_a)
 
                 if ('seamless' in cfg.mode and cfg.color_transfer_mode != 0) or \
                    cfg.mode == 'seamless-hist-match' or \
@@ -360,7 +350,7 @@ def MergeMaskedFace (predictor_func, predictor_input_shape,
     if out_img is None:
         out_img = img_bgr.copy()
         
-    return out_img, out_merging_mask_a
+    return out_img, out_merging_mask_a, data
 
 
 def MergeMasked (predictor_func,
@@ -372,39 +362,30 @@ def MergeMasked (predictor_func,
     img_bgr_uint8 = cv2_imread(frame_info.filepath)
     img_bgr_uint8 = imagelib.normalize_channels (img_bgr_uint8, 3)
     img_bgr = img_bgr_uint8.astype(np.float32) / 255.0
-    
-    
-    #plt.imsave('img_bgr.jpg',img_bgr )
-    
+
     outs = []
     for face_num, img_landmarks in enumerate( frame_info.landmarks_list ):
-        out_img, out_img_merging_mask = MergeMaskedFace (predictor_func, predictor_input_shape, face_enhancer_func, xseg_256_extract_func, cfg, frame_info, img_bgr_uint8, img_bgr, img_landmarks)
+        out_img, out_img_merging_mask, data = MergeMaskedFace (predictor_func, predictor_input_shape, face_enhancer_func, xseg_256_extract_func, cfg, frame_info, img_bgr_uint8, img_bgr, img_landmarks)
+        np.array(data).dump('/tmp/data_'+str(frame_info.filepath).split('/')[-1].split('.')[0]+'_.npy')
         outs += [ (out_img, out_img_merging_mask) ]
 
     #Combining multiple face outputs
     final_img = None
     final_mask = None
     for img, merging_mask in outs:
-    
-    
-      
         h,w,c = img.shape
 
         if final_img is None:
             final_img = img
             final_mask = merging_mask
         else:
-        
-        
-            
-            
             final_img = final_img*(1-merging_mask) + img*merging_mask
             final_mask = np.clip (final_mask + merging_mask, 0, 1 )
-            
-            
 
     final_img = np.concatenate ( [final_img, final_mask], -1)
-    
-    
 
     return (final_img*255).astype(np.uint8)
+
+
+
+

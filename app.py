@@ -106,19 +106,8 @@ try:
 
 
         def killall():
-            g = getoutput('sudo fuser -v /dev/nvidia-uvm')
-            import os
-            pids = []
-            pid = os.getpid()
-            for i in g:
-              for j in i.split(' '):
-                try:
-                  j = int(j)
-                  if j!=pid:
-                    pids.append(j)
-                    os.system('kill -9 '+str(j))
-                except:
-                  pass
+            os.system('sudo fuser -k /dev/nvidia-uvm')
+            
                   
         killall()
         
