@@ -2,6 +2,9 @@ try:
 
 
     while True:
+    
+    
+    
 
         from IPython.display import clear_output
         import zipfile
@@ -67,6 +70,8 @@ try:
         from facelib import FaceType
         global labelsdict
         global run
+        global no_loop
+        no_loop = False
         run = Value("i", 0)
         manager = Manager()
         labelsdict = manager.dict()
@@ -89,7 +94,12 @@ try:
 
         import dash_player
         import argparse
-
+        from random import *
+        
+        
+        
+            
+            
         parser = argparse.ArgumentParser(description='FakeLab Options')
 
         parser.add_argument('drivepath', type=str, nargs='?',
@@ -197,10 +207,18 @@ try:
         if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
         if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
         if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
+        
+        
+        
+        if not os.path.isfile('/content/workspace/model/model.txt'):
+        
+            convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
+                    
+            f = open('/content/workspace/model/model.txt','w+')
+            f.write(convert_id)
+            f.close()
         from inspect import currentframe, getframeinfo
 
-        global convert_id
-        convert_id = ''
 
         class VideoCamera(object):
             def __init__(self):
@@ -338,7 +356,9 @@ try:
         def Convert():
         
         
-            global convert_id
+            f = open('/content/workspace/model/model.txt','r')
+            convert_id = f.read()
+            f.close()
                 
               
             output_name = 'result' + '_' + convert_id + '.mp4'
@@ -356,7 +376,12 @@ try:
         
 
         def save_workspace_data():
-
+        
+        
+          f = open('/content/workspace/model/model.txt','r')
+          convert_id = f.read()
+          f.close()
+          #print ('jjkdhsjksjkdkdkdkdkldkdkdkdlld#@@@@@@@@@@@@@@@@@' + convert_id)
           os.system('zip -r -q workspace_'+convert_id+'.zip workspace'); 
           os.system('cp /content/workspace_'+convert_id+'.zip '+drive_path)
           ##########print ('###############################' + 'save_workspace_data')
@@ -366,7 +391,12 @@ try:
           while 1:
 
             time.sleep(3600*2)
-
+            #print ('jjkdhsjksjkdkdkdkdkldkdkdkdlld###############' + convert_id)
+            
+            
+            f = open('/content/workspace/model/model.txt','r')
+            convert_id = f.read()
+            f.close()
             os.system('zip -ur workspace_'+convert_id+'.zip workspace/model'); os.system('cp /content/workspace_'+convert_id+'.zip '+drive_path)
             ##########print ('###############################' + 'save_workspace_model')
             
@@ -392,10 +422,10 @@ try:
                     if os.path.isfile("/content/workspace/result_preview.mp4"):
                         clip = mp.VideoFileClip("/content/workspace/result_preview.mp4")
                         clip_resized = clip.resize(height=360) # make the height 360px ( According to moviePy documenation The width is then computed so that the width/height ratio is conserved.)
-                        convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
+                        convert_id_ = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
                         [os.remove(i) for i in glob.glob("/content/assets/*mp4")]
                         
-                        clip_resized.write_videofile("/content/assets/result_preview"+convert_id+".mp4")
+                        clip_resized.write_videofile("/content/assets/result_preview"+convert_id_+".mp4")
                     else:
                     
                         print ('No file found')
@@ -406,7 +436,7 @@ try:
                 
                     time.sleep(60)
                     
-        from random import *
+        
 
         def Main(q, labelsdict, run, option_id):
             
@@ -416,7 +446,7 @@ try:
             global option_
             global thread_list
             import os
-            global convert_id
+            #global convert_id
             import time
             ##########print (option_)
 
@@ -426,10 +456,14 @@ try:
             
             if model == '(1) New Workspace':
 
-                if convert_id == '':
-            
-                    convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
-                    
+              
+        
+                
+                
+                f = open('/content/workspace/model/model.txt','r')
+                convert_id = f.read()
+                f.close()
+                
                 if len(src_vids_clip)>0 and len(tar_vids_clip)>0:    
                         
                     if os.path.isdir('/content/workspace/'):
@@ -445,11 +479,11 @@ try:
                     
                     model_name = 'workspace_'+convert_id + '.zip'
                     
-                    q.put('Loading Workspace')
+                    q.put('[1/7] Loading Workspace')
                     
                     time.sleep(3)
              
-                    q.put  ('Merging Source Videos')
+                    q.put  ('[2/7] Merging Source Videos')
                 
                     try:
                     
@@ -464,7 +498,7 @@ try:
                         return False
                         
 
-                    q.put  ('Merging Target Videos')
+                    q.put  ('[3/7] Merging Target Videos')
                     
                     try:
 
@@ -479,7 +513,7 @@ try:
                         return False
                         
                   
-                    q.put  ('Extracting frames ')
+                    q.put  ('[4/7] Extracting frames ')
                     
                     p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
                         subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
@@ -494,7 +528,7 @@ try:
                         
                         
                         
-                    q.put  ('Extracting faces ')
+                    q.put  ('[5/7] Extracting faces ')
                     
                     p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
                         subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
@@ -507,7 +541,7 @@ try:
                         
 
                     
-                    q.put  ('Face clustering')
+                    q.put  ('[6/7] Face clustering')
                     
                     
                     labelsdict['src_face_labels'] = ffc.Get_face_clustered_labels('workspace/data_src/aligned')
@@ -542,7 +576,7 @@ try:
                     
                                    
                     
-                    q.put  ('Extracting face masks ')
+                    q.put  ('[7/7] Extracting face masks ')
                     
                     p = os.system('python face_seg.py')
                     if p != 0: 
@@ -592,13 +626,13 @@ try:
                 
                 
             elif model == '(2) Resume Workspace':
-            
                 
-            
-                if convert_id == '':
-            
-                    convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
-            
+        
+                f = open('/content/workspace/model/model.txt','r')
+                convert_id = f.read()
+                f.close()
+              
+               
                 
                 q.put('#ID-' + convert_id)
                     
@@ -649,12 +683,12 @@ try:
                 
                     if os.path.isfile('/content/workspace/data_dst.mp4') and os.path.isfile('/content/workspace/data_src.mp4'):
                     
-                        q.put('Loading Workspace')
+                        q.put('[1/5] Loading Workspace')
                         
                         time.sleep(3)
 
 
-                        q.put  ('Extracting frames ')
+                        q.put  ('[2/5] Extracting frames ')
                     
                         p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
                             subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
@@ -669,7 +703,7 @@ try:
                             
                             
                             
-                        q.put  ('Extracting faces ')
+                        q.put  ('[3/5] Extracting faces ')
                         
                         p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
                             subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
@@ -682,7 +716,7 @@ try:
                             
 
                         
-                        q.put  ('Face clustering')
+                        q.put  ('[4/5] Face clustering')
                         
                         
                         labelsdict['src_face_labels'] = ffc.Get_face_clustered_labels('workspace/data_src/aligned')
@@ -717,7 +751,7 @@ try:
                         
                                        
                         
-                        q.put  ('Extracting face masks ')
+                        q.put  ('[5/5] Extracting face masks ')
                         
                         p = os.system('python face_seg.py')
                         if p != 0: 
@@ -776,12 +810,12 @@ try:
                         
                             model_name = 'workspace_'+convert_id + '.zip'
                 
-                            q.put('Loading Workspace')
+                            q.put('[1/7] Loading Workspace')
                             
                             time.sleep(3)
                      
 
-                            q.put  ('Merging Source Videos')
+                            q.put  ('[2/7] Merging Source Videos')
             
                             try:
                             
@@ -796,7 +830,7 @@ try:
                                 return False
                                 
 
-                            q.put  ('Merging Target Videos')
+                            q.put  ('[3/7] Merging Target Videos')
                             
                             try:
 
@@ -811,7 +845,7 @@ try:
                                 return False
                                 
                             
-                            q.put  ('Extracting frames ')
+                            q.put  ('[4/7] Extracting frames ')
                     
                             p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
                                 subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
@@ -826,7 +860,7 @@ try:
                                 
                                 
                                 
-                            q.put  ('Extracting faces ')
+                            q.put  ('[5/7] Extracting faces ')
                             
                             p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
                                 subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
@@ -839,7 +873,7 @@ try:
                                 
 
                             
-                            q.put  ('Face clustering')
+                            q.put  ('[6/7] Face clustering')
                             
                             
                             labelsdict['src_face_labels'] = ffc.Get_face_clustered_labels('workspace/data_src/aligned')
@@ -874,7 +908,7 @@ try:
                             
                                            
                             os.system('python /content/DeepFaceLab/preview.py')
-                            q.put  ('Extracting face masks ')
+                            q.put  ('[7/7] Extracting face masks ')
                             
                             p = os.system('python face_seg.py')
                             if p != 0: 
@@ -925,7 +959,7 @@ try:
             
             
             
-                convert_id = model.split('_')[-1].split('.')[0]
+                convert_id = model.split('workspace_')[-1].split('.')[0]
                 ##########print (convert_id)
                 
                 q.put('#ID-' + convert_id)
@@ -934,7 +968,7 @@ try:
 
                 if os.path.isfile('/content/workspace/data_dst.mp4') and os.path.isfile('/content/workspace/data_src.mp4'):
                 
-                    q.put('Downlaoding Model' )
+                    q.put('[1/2] Downlaoding Model' )
             
                     import zipfile
                     print ('Extracting files... ')
@@ -948,7 +982,7 @@ try:
                     os.system('python /content/DeepFaceLab/preview.py')
                             
                     
-                    q.put('Loading Workspace')
+                    q.put('[2/2] Loading Workspace')
                     
                     
                     thr1 = Process(target = save_workspace_data, args=())
@@ -996,7 +1030,7 @@ try:
                     if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
                     if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
                     
-                    q.put('Downlaoding Workspace')
+                    q.put('[1/2] Downlaoding Workspace')
                     import zipfile
                     print ('Extracting files... ')
                     zf = zipfile.ZipFile(os.path.join(drive_path_,model_name))
@@ -1013,7 +1047,7 @@ try:
                     
                     os.system('python /content/DeepFaceLab/preview.py')
                     
-                    q.put('Loading Workspace')
+                    q.put('[2/2] Loading Workspace')
                     
                     thr1 = Process(target = save_workspace_data, args=())
                     thr1.daemon=True   
@@ -1177,7 +1211,7 @@ try:
 
         Progress =  html.Div([dbc.InputGroup(
                     [dbc.InputGroupAddon("Model", addon_type="prepend"), dbc.Select(id = 'start_text_input', options = option_, value = '0'), dbc.Select(id = 'face_type_select', 
-                    options = [{'label' : 'Head', 'value' : '0'}, {'label' : 'Full face', 'value' : '1'}, {'label' : 'Face', 'value' : '2'}], value = '0'),
+                    options = [{'label' : 'Head', 'value' : '0'}, {'label' : 'Full face', 'value' : '1'}, {'label' : 'Face', 'value' : '2'}], value = '1'),
                     dbc.Button(outline=True, id = 'start_text_continue', active=False, disabled = False, color="success", className="fas fa-check-circle")
             ], 
                     size="sm",
@@ -1273,7 +1307,7 @@ try:
         dbc.Row([dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Face type", addon_type="prepend"),dbc.Select(id = 'face_type_', options = [{'label':'Head', "value" :0},
         {'label':'Face', "value" :1}, 
         {'label':'Full Face', "value" :2}, 
-        ], value = '0')], size="sm"),),
+        ], value = '2')], size="sm"),),
         
         dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Mask type", addon_type="prepend"),dbc.Select(id = 'mask_mode_', options = [{'label':'dst', "value" :1},
         {'label':'learned-prd', "value" :2}, 
@@ -1537,9 +1571,11 @@ try:
         except:
             sec_s = ''
             
-        choose_face = html.Div([dbc.Row([dbc.Col(html.Div(id = 'all_imgs_faces'))]), html.Br(),
+        choose_face = html.Div([html.Div(id = 'all_imgs_faces'), html.Br(),
         
-        dbc.Button('Next ', outline=True, id = 'okay_face_select', active=False, color="success",  size = 'sm',  style = {'margin-left': 'auto', 'margin-right': 'auto'}), html.Div(id = 'okay_face_select_text')])
+        dbc.Button('Next ', outline=True, id = 'okay_face_select', active=False, color="success",  size = 'sm',  style = {'margin-left': 'auto', 'margin-right': 'auto'}), 
+        
+        html.Div(id = 'okay_face_select_text')])
         
         controls_start = dbc.Jumbotron(
             [
@@ -1571,10 +1607,9 @@ try:
                 #dbc.Toast(Images, id="toggle-add-Images",header="Generated Images",is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "800px"}),
                 dbc.Toast(Settings, id="toggle-add-Settings",header="Edit configuration file",is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "800px"}),
                 #dbc.Toast(Result, id="toggle-add-Result",header="Output",is_open=False,icon="primary",dismissable=True),
-                dbc.Row([dbc.Toast(choose_face, id="toggle-add-face",header="Choose face profile",is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "500px"})],
-                    align="center",       
-                    
-                ),
+                dbc.Row([dbc.Col(dbc.Toast(choose_face, id="toggle-add-face",header="Choose face profile",is_open=False,icon="primary",dismissable=True,  style={"maxWidth": "1000px"})),
+                dbc.Col(dbc.Toast(html.Div(id = 'daacsx'), is_open=False, icon="primary",dismissable=True,  style={"maxWidth": "1000px"}))], no_gutters=True,),
+            
                 html.Hr(className="my-2"),
                 #html.P("Don't close this window during the process. You can Play or Download the Generated video anytime by clicking on the Result Tab ", id = 'output_text_3'),
              dcc.Interval(
@@ -2163,14 +2198,27 @@ try:
                     
             if os.path.isdir('/content/workspace/'):
                 shutil.rmtree('/content/workspace/')
-
+                
+            
+            if os.path.isdir('/content/assets'):
+                shutil.rmtree('/content/assets')
+            
+            
             if not os.path.isdir('/content/workspace'): os.mkdir('/content/workspace')
             if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
             if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
             if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
-                    
-
+            if not os.path.isdir('/content/assets'): os.mkdir('/content/assets')
             
+                    
+            if not os.path.isfile('/content/workspace/model/model.txt'):
+        
+                convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
+                        
+                f = open('/content/workspace/model/model.txt','w+')
+                f.write(convert_id)
+                f.close()
+                
 
             
             return  [ True, str(video_index()), str(duration()) + 's']
@@ -3063,7 +3111,7 @@ try:
           global cvt_id
           global thread_list
           global threadon_
-
+          global no_loop
           global cols
           global open_choose_box
           
@@ -3231,7 +3279,8 @@ try:
                   message = gui_queue.get_nowait()
               except:            
                   message = None 
-
+                  
+              heading_update  = dash.no_update  
 
               if message:
                 
@@ -3262,16 +3311,31 @@ try:
                     
                     return [heading_update, 'Training stopped', True, True, True, error, True, 1000000, open_choose_box, cols]
                     
+                
                     
+                if not no_loop:
+                
+                  try:
+                  
+                    f = open('/content/workspace/model/model.txt','r')
+                    convert_id = f.read()
+                    f.close()
                     
-                
-              try:
-              
-                heading_update = ['Training ' , dbc.Badge(cvt_id, color="light", className="ml-1")]
-                
-              except:
-                
-                heading_update =  ['Training ...']
+                    title_project = html.Div(dbc.InputGroup(
+                                    [
+                                            dbc.InputGroupAddon("Training ID", addon_type="prepend"),
+                                            dbc.Input(placeholder=convert_id, id = 'convert_id_place'),
+                                        ],
+                                        className="mb-3",
+                                    ), style = {'width': '250px'})
+                      
+                    heading_update = title_project#html.Div(dbc.Row([dbc.Col('Training ') , dbc.Col(title_project)], no_gutters = True))
+                    
+                    no_loop = True
+                    
+                  except:
+                    
+                    heading_update =  ['Training Starting...']
                 
                 
               jpgs = len(glob.glob('workspace/model/*.jpg'))
@@ -3321,6 +3385,51 @@ try:
           
               return [  'Start the Process', 'Choose an option', False, d3, False,  '', False, s4, open_choose_box, cols]
         
+        
+        
+        @app.callback(Output('convert_id_place', 'placeholder'), [Input('convert_id_place', 'value')])
+        
+        def update(cvt):
+        
+            print (cvt)
+        
+            trigger_id = dash.callback_context.triggered[0]['prop_id']
+            
+            if trigger_id == 'convert_id_place.value':
+            
+            
+                global convert_id
+                
+                f = open('/content/workspace/model/model.txt','r')
+                convert_id = f.read()
+                f.close()
+                
+                prev_zip_name = '/content/workspace_'+convert_id+'.zip'
+                
+                
+                prev_zip_name_ = os.path.join(drive_path,'workspace_'+convert_id+'.zip')
+
+                convert_id = cvt
+                f = open('/content/workspace/model/model.txt','w+')
+                f.write(convert_id)
+                f.close()
+                
+                new_zip_name = '/content/workspace_'+convert_id+'.zip'
+                
+                new_zip_name_ = os.path.join(drive_path,'workspace_'+convert_id+'.zip')
+                
+                try:
+                    os.rename(prev_zip_name, new_zip_name)
+                except:
+                    pass
+                try:
+                    os.rename(prev_zip_name_, new_zip_name_)
+                except:
+                    pass
+                    
+                return convert_id
+            else:
+                return dash.no_update
         
         
         @app.callback([Output('src_face_img', 'src'),Output('src_frames_nos', 'children'), Output('add_src_face', 'disabled'), Output('src_slider', 'max'), Output('src_slider', 'marks')],
@@ -3709,11 +3818,11 @@ try:
             trigger_id = dash.callback_context.triggered[0]['prop_id']
             global cfg_merge 
             done = 0
-            global convert_id
+            #global convert_id
             
-            if convert_id == '':
-            
-                convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
+            f = open('/content/workspace/model/model.txt','r')
+            convert_id = f.read()
+            f.close()
                 
             if n and trigger_id=='convert_start.n_clicks':
             
