@@ -393,7 +393,7 @@ try:
                     os.system('rm -r /content/workspace/preview/merged')
                     os.mkdir('/content/workspace/preview/merged')
                 
-                    os.system("printf '0\nCPU\n' | python DeepFaceLab/merger/Merger_preview.py")
+                    os.system("printf '0\nCPU\n' | python DeepFaceLab/main.py merge --input-dir /content/workspace/preview --output-dir /content/workspace/preview/merged --output-mask-dir /content/workspace/preview/merged_mask --aligned-dir /content/workspace/preview/aligned --model-dir workspace/model --model SAEHD")
                     os.system("printf '10\n' | python DeepFaceLab/main.py videoed video-from-sequence_  --input-dir /content/workspace/preview/merged --output-file workspace/result_preview.mp4")
                     
                     import moviepy.editor as mp
