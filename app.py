@@ -463,8 +463,10 @@ try:
         
                 
                 
-                f = open('/tmp/model.txt','r')
-                convert_id = f.read()
+                convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
+                    
+                f = open('/tmp/model.txt','w+')
+                f.write(convert_id)
                 f.close()
                 
                 if len(src_vids_clip)>0 and len(tar_vids_clip)>0:    
@@ -616,15 +618,17 @@ try:
 
                     clear_output()
                     p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
-
-                    if p != 0: 
-                        q.put('Error during training process! ')
-                        return False
+                    
+                    
+                    
+                    q.put(':Stopped:')
+                       
                         
                     return True
+                    
                 else:
                 
-                    q.put('Error! No training data.')
+                    q.put(':Stopped:')
                     return False
                 
                 
@@ -671,12 +675,22 @@ try:
                     thr3.daemon=True   
                     thr3.start()
                     thread_list.append(thr3)
-                    
+                    print ('######################################################################')
+                    print ('######################################################################')
+                    print ('######################################################################')
+                    print ('######################################################################')
+                    print ('######################################################################')
+                    print ('######################################################################')
+                    print ('######################################################################')
                     p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
-
-                    if p != 0: 
-                        q.put('Error during training process! ')
-                        return False
+                    
+                    print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
+                    print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
+                    print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
+                    print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
+                    print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
+                    print (p)
+                    q.put(':Stopped:')
                         
                     return True
                     
@@ -787,10 +801,9 @@ try:
                         thread_list.append(thr3)
 
                         p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
-
-                        if p != 0: 
-                            q.put('Error during training process! ')
-                            return False
+                        print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
+                        print (p)
+                        q.put(':Stopped:')
                             
                         return True
                         
@@ -944,16 +957,15 @@ try:
                             thr3.start()
                             thread_list.append(thr3)
                             p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
-
-                            if p != 0: 
-                                q.put('Error during training process! ')
-                                return False
+                            print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
+                            print (p)
+                            q.put(':Stopped:')
                                 
                             return True
                                 
                         else:
 
-                            q.put('Error! No training data! ')
+                            q.put(':Stopped:')
                             
                             return False
                             
@@ -963,6 +975,14 @@ try:
             
             
                 convert_id = model.split('workspace_')[-1].split('.')[0]
+                
+                #if not os.path.isfile('/tmp/model.txt'):
+        
+                #convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
+                        
+                f = open('/tmp/model.txt','w+')
+                f.write(convert_id)
+                f.close()
                 ##########print (convert_id)
                 
                 q.put('#ID-' + convert_id)
@@ -1015,9 +1035,7 @@ try:
 
                     p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
 
-                    if p != 0: 
-                        q.put('Error during training process! ')
-                        return False
+                    q.put(':Stopped:')
                         
                     return True
                     
@@ -1079,12 +1097,10 @@ try:
                     
                     q.put('Training In Progress')
 
-
+                    
                     p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
 
-                    if p != 0: 
-                        q.put('Error during training process! ')
-                        return False
+                    q.put(':Stopped:')
                         
                     return True
 
@@ -2173,12 +2189,12 @@ try:
             #threading.Thread(target=resetall, args=(), daemon=True).start()
             
            
-            os.system("for i in $(sudo lsof /dev/nvidia0 | grep python  | awk '{print $2}' | sort -u); do kill -9 $i; done")
+            #os.system("for i in $(sudo lsof /dev/nvidia0 | grep python  | awk '{print $2}' | sort -u); do kill -9 $i; done")
             
             
-            with open('/tmp/log.txt', 'r') as f:
-                pids = [i[:-1] for i in f.readlines()] 
-                f.close()
+           # with open('/tmp/log.txt', 'r') as f:
+           #     pids = [i[:-1] for i in f.readlines()] 
+           #     f.close()
             
             #########print (pids)
             killall()
@@ -2197,7 +2213,7 @@ try:
             #shutil.rmtree('videos/Source/Final'); os.mkdir('videos/Source/Final')
 
          
-
+            killall()
                     
             if os.path.isdir('/content/workspace/'):
                 shutil.rmtree('/content/workspace/')
@@ -2223,6 +2239,7 @@ try:
                 f.close()
                 
 
+            
             
             return  [ True, str(video_index()), str(duration()) + 's']
 
@@ -3115,9 +3132,21 @@ try:
           global thread_list
           global threadon_
           global no_loop
+          
+   
+          status_children = dash.no_update
+          Progress_header = dash.no_update
+          start_text_continue_disabled = dash.no_update
+          start_text_input_disabled = dash.no_update
+          face_type_select_disabled = dash.no_update
+          modal_error_details = ''
+          modal_error_is_open = False
+          interval_interval = dash.no_update
+          #open_choose_box = open_choose_box
+          #cols = dash.no_update
           global cols
           global open_choose_box
-          
+
           trigger_id = dash.callback_context.triggered[0]['prop_id']
           
           if n is not None and trigger_id == 'start_text_continue.n_clicks':
@@ -3154,7 +3183,6 @@ try:
           if n is not None:
           
               global watch
-            
               global labelsdict
               global run
 
@@ -3167,7 +3195,7 @@ try:
                 thr = Process(target = Main, args=(gui_queue, labelsdict, run, model_name,))
                 
                 thr.start()
-                thread_list.append(thr)
+                #thread_list.append(thr)
                 
 
                 #threading.Thread(target=Main, args=(gui_queue,), daemon=True).start()
@@ -3177,6 +3205,9 @@ try:
                 ##########print ( 'ddabjhjkasfawbwfbjbkwfbkfabkfbkfafbkkbaf')
 
                 threadon = False
+                start_text_continue_disabled = True
+                start_text_input_disabled = True
+                face_type_select_disabled = True
 
               if not threadon_:
               
@@ -3184,6 +3215,8 @@ try:
                 
                 
               if run.value and threadon_:
+              
+                #print ('#########' +run.value)
                  
                 if len(labelsdict['src_face_labels']) <=1 and len(labelsdict['dst_face_labels']) <=1:
                 
@@ -3267,6 +3300,8 @@ try:
                     
                     open_choose_box = True
                     threadon_ = False
+                    
+                    
 
               
               
@@ -3283,7 +3318,7 @@ try:
               except:            
                   message = None 
                   
-              heading_update  = dash.no_update  
+              #status_children  = dash.no_update  
 
               if message:
                 
@@ -3292,7 +3327,7 @@ try:
                 
                 
                 
-                
+                print (message)
                 
                 if message.startswith('#ID-'):
                 
@@ -3301,21 +3336,8 @@ try:
                     
                     msglist = message
                     
-                    
-                if message.startswith('Error'):
                 
-                    error = message
-                    
-                    heading_update = 'Error! Refresh Page'
-                    
-                    time.sleep(2)
-                    
-                   
-                    
-                    return [heading_update, 'Training stopped', True, True, True, error, True, 1000000, open_choose_box, cols]
-                    
                 
-                    
                 if not no_loop:
                 
                   try:
@@ -3332,62 +3354,94 @@ try:
                                         className="mb-3",
                                     ), style = {'width': '250px'})
                       
-                    heading_update = title_project#html.Div(dbc.Row([dbc.Col('Training ') , dbc.Col(title_project)], no_gutters = True))
+                    status_children = title_project#html.Div(dbc.Row([dbc.Col('Training ') , dbc.Col(title_project)], no_gutters = True))
                     
                     no_loop = True
                     
                   except:
                     
-                    heading_update =  ['Training Starting...']
-                
-                
-              jpgs = len(glob.glob('workspace/model/*.jpg'))
-              mp4s = len(glob.glob('workspace/result*.mp4'))
-              
-              
-              if jpgs>0:
-                
-                img_disabled = False
-                
-              else:
-                
-                img_disabled = True
-                
-              if mp4s>0:
-                
-                res_disabled = False
-                
-              else:
-                
-                res_disabled = True 
-                
-                
-              try:
-                
-                header = watch.get_interval()
-                
-                try:
-                    iters = str(open('/content/workspace/model/iteration.txt','r').read())
+                    status_children =  ['Training Starting...']
                     
-                    itt = '['+iters + '] '
+              
+              
+              if not threadon:
+              
+                  try:
                     
-                except:
-    
-                    itt = ''
-                 
-              except:
-              
-                
-                header = ''
-                
-                itt = ''
-              
-              return [  heading_update,'['+header+'] '+itt+msglist, True, True, True,  '', False, s4, open_choose_box, cols]
-              
-          else:
-          
-              return [  'Start the Process', 'Choose an option', False, d3, False,  '', False, s4, open_choose_box, cols]
+                    header = watch.get_interval()
+                    
+                    try:
+                        iters = str(open('/content/workspace/model/iteration.txt','r').read())
+                        
+                        itt = '['+iters + '] '
+                        
+                    except:
         
+                        itt = ''
+                     
+                  except:
+                  
+                    
+                    header = ''
+                    
+                    itt = ''
+                  
+                  if msglist != ':Stopped:': 
+                    
+                    Progress_header = '['+header+'] '+itt+msglist
+                  
+                  
+              
+              if message:
+              
+              
+                if message.startswith(':Stopped:'):
+                
+                    modal_error_details = message
+                    
+                    status_children = 'Training Stopped'
+                    message = ''
+                    #time.sleep(2)
+                    threadon = True
+                    threadon_ = True
+                    no_loop = False
+                    Progress_header = 'Choose an option'
+                    
+                    
+                    start_text_continue_disabled = False
+                    start_text_input_disabled = False
+                    face_type_select_disabled = False
+                    
+                    
+                    #return [status_children, Progress_header, start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled, modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
+                    
+                
+                    
+                
+               
+                
+                
+              
+              
+              
+              #return [  status_children,Progress_header, start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled,  modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
+              
+          #else:
+          
+              #status_children = 'Start the Process'
+              
+              #Progress_header = 'Choose an option'
+              
+              
+              #start_text_continue_disabled = False
+              #start_text_input_disabled = d3
+              #face_type_select_disabled = False
+          
+              #return [  status_children, Progress_header , start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled,  modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
+        
+        
+          return [  status_children, Progress_header , start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled,  modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
+            
         
         
         @app.callback(Output('convert_id_place', 'placeholder'), [Input('convert_id_place', 'value')])
