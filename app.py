@@ -210,13 +210,16 @@ try:
         
         
         
-        if not os.path.isfile('/content/workspace/model/model.txt'):
+        if not os.path.isfile('/tmp/model.txt'):
         
             convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
                     
-            f = open('/content/workspace/model/model.txt','w+')
+            f = open('/tmp/model.txt','w+')
             f.write(convert_id)
             f.close()
+            
+            
+            
         from inspect import currentframe, getframeinfo
 
 
@@ -356,7 +359,7 @@ try:
         def Convert():
         
         
-            f = open('/content/workspace/model/model.txt','r')
+            f = open('/tmp/model.txt','r')
             convert_id = f.read()
             f.close()
                 
@@ -378,7 +381,7 @@ try:
         def save_workspace_data():
         
         
-          f = open('/content/workspace/model/model.txt','r')
+          f = open('/tmp/model.txt','r')
           convert_id = f.read()
           f.close()
           #print ('jjkdhsjksjkdkdkdkdkldkdkdkdlld#@@@@@@@@@@@@@@@@@' + convert_id)
@@ -394,7 +397,7 @@ try:
             #print ('jjkdhsjksjkdkdkdkdkldkdkdkdlld###############' + convert_id)
             
             
-            f = open('/content/workspace/model/model.txt','r')
+            f = open('/tmp/model.txt','r')
             convert_id = f.read()
             f.close()
             os.system('zip -ur workspace_'+convert_id+'.zip workspace/model'); os.system('cp /content/workspace_'+convert_id+'.zip '+drive_path)
@@ -460,7 +463,7 @@ try:
         
                 
                 
-                f = open('/content/workspace/model/model.txt','r')
+                f = open('/tmp/model.txt','r')
                 convert_id = f.read()
                 f.close()
                 
@@ -628,7 +631,7 @@ try:
             elif model == '(2) Resume Workspace':
                 
         
-                f = open('/content/workspace/model/model.txt','r')
+                f = open('/tmp/model.txt','r')
                 convert_id = f.read()
                 f.close()
               
@@ -2211,11 +2214,11 @@ try:
             if not os.path.isdir('/content/assets'): os.mkdir('/content/assets')
             
                     
-            if not os.path.isfile('/content/workspace/model/model.txt'):
+            if not os.path.isfile('/tmp/model.txt'):
         
                 convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
                         
-                f = open('/content/workspace/model/model.txt','w+')
+                f = open('/tmp/model.txt','w+')
                 f.write(convert_id)
                 f.close()
                 
@@ -3317,7 +3320,7 @@ try:
                 
                   try:
                   
-                    f = open('/content/workspace/model/model.txt','r')
+                    f = open('/tmp/model.txt','r')
                     convert_id = f.read()
                     f.close()
                     
@@ -3400,7 +3403,7 @@ try:
             
                 global convert_id
                 
-                f = open('/content/workspace/model/model.txt','r')
+                f = open('/tmp/model.txt','r')
                 convert_id = f.read()
                 f.close()
                 
@@ -3410,7 +3413,7 @@ try:
                 prev_zip_name_ = os.path.join(drive_path,'workspace_'+convert_id+'.zip')
 
                 convert_id = cvt
-                f = open('/content/workspace/model/model.txt','w+')
+                f = open('/tmp/model.txt','w+')
                 f.write(convert_id)
                 f.close()
                 
@@ -3820,7 +3823,7 @@ try:
             done = 0
             #global convert_id
             
-            f = open('/content/workspace/model/model.txt','r')
+            f = open('/tmp/model.txt','r')
             convert_id = f.read()
             f.close()
                 
