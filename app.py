@@ -207,7 +207,7 @@ try:
         if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
         if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
         if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
-        
+        if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
         
         
         if not os.path.isfile('/tmp/model.txt'):
@@ -366,7 +366,9 @@ try:
               
             output_name = 'result' + '_' + convert_id + '.mp4'
 
-            ##########print ('###############################' + output_name)
+            ##########print ('###############################' + output_name
+            if not os.path.isdir('workspace/data_dst/merged'): os.mkdir('workspace/data_dst/merged')
+            if not os.path.isdir('workspace/data_dst/merged_mask'): os.mkdir('workspace/data_dst/merged_mask')
 
             os.system('echo | python DeepFaceLab/main.py merge --input-dir workspace/data_dst --output-dir workspace/data_dst/merged --output-mask-dir workspace/data_dst/merged_mask --aligned-dir workspace/data_dst/aligned --model-dir workspace/model --model SAEHD')
             os.system('echo | python DeepFaceLab/main.py videoed video-from-sequence_ --input-dir workspace/data_dst/merged --output-file workspace/'+output_name+' --reference-file workspace/data_dst.mp4 --include-audio')
@@ -431,7 +433,7 @@ try:
                         clip_resized.write_videofile("/content/assets/result_preview"+convert_id_+".mp4")
                     else:
                     
-                        print ('No file found')
+                        #print ('No file found')
                         time.sleep(60)
                     
                     
@@ -675,21 +677,10 @@ try:
                     thr3.daemon=True   
                     thr3.start()
                     thread_list.append(thr3)
-                    print ('######################################################################')
-                    print ('######################################################################')
-                    print ('######################################################################')
-                    print ('######################################################################')
-                    print ('######################################################################')
-                    print ('######################################################################')
-                    print ('######################################################################')
+
                     p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
                     
-                    print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
-                    print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
-                    print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
-                    print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
-                    print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
-                    print (p)
+        
                     q.put(':Stopped:')
                         
                     return True
@@ -801,8 +792,7 @@ try:
                         thread_list.append(thr3)
 
                         p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
-                        print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
-                        print (p)
+                
                         q.put(':Stopped:')
                             
                         return True
@@ -957,8 +947,7 @@ try:
                             thr3.start()
                             thread_list.append(thr3)
                             p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
-                            print ('saffjbjbufhikaknsakskskkskskkskssksksksksks')
-                            print (p)
+                          
                             q.put(':Stopped:')
                                 
                             return True
@@ -1260,11 +1249,8 @@ try:
         for j,idx in enumerate([i for i in os.listdir(drive_path_) if i.startswith('workspace')]):
 
             option_convert.append({"label": ' ' + idx + ' [' + str(os.path.getsize(os.path.join(drive_path_,idx)) >> 20) +' MB]', "value" : j+2} )
-        if len(npy_files)>0:
-            convert_disabled = False
-            
-        else:
-            convert_disabled = True
+        
+        convert_disabled = False
             
             
             
@@ -1599,12 +1585,8 @@ try:
         controls_start = dbc.Jumbotron(
             [
                 html.H1("Start the Process", id  = 'status'),
-                html.P(
-                    "Generate faceswaped output",
-                    
-                    className="lead",
-                ),
-
+              
+                html.Br(),
                 dbc.ButtonGroup(
                     [dbc.Button(outline=True, id = 'Start-click', active=False, disabled = False, color="success", className="fas fa-hourglass-start"),
         #dbc.Button(outline=True, id = 'Images-addclick', active=False,disabled = True, color="primary", className="fas fa-image"),
@@ -1633,7 +1615,7 @@ try:
                 #html.P("Don't close this window during the process. You can Play or Download the Generated video anytime by clicking on the Result Tab ", id = 'output_text_3'),
              dcc.Interval(
                     id='interval-1',
-                    interval=5000, # in milliseconds
+                    interval=10000, # in milliseconds
                     n_intervals=0
                 )
             ,
@@ -1856,7 +1838,8 @@ try:
                 html.Div(id = 'temp2_2', style = {'display': 'none'}),
                 html.Div(id = 'tempvar', style = {'display': 'none'}), 
                 html.Div(id = 'refresh__', style = {'display': 'none'})   ,
-                html.Div(id = 'confirm_delete', style = {'display': 'none'})                    
+                html.Div(id = 'confirm_delete', style = {'display': 'none'}) ,
+                html.Div(id = 'temp_delete', style = {'display': 'none'})                 
         ],fluid=True, style = {'width':'60%'}
         )
 
@@ -2122,7 +2105,8 @@ try:
              
              Output("Reset-addclick", "disabled"),
              Output("n_video", "children"),
-             Output("n_sec_video", "children")],
+             Output("n_sec_video", "children"),
+             Output("temp_delete", "children")],
             [Input('temp1', 'children'), 
              Input('temp2', 'children'),
              Input('Reset-addclick', 'n_clicks'),
@@ -2199,8 +2183,10 @@ try:
             #########print (pids)
             killall()
             #shutdown() 
+            time.sleep(1)
+            
                 
-            return  [ True, str(video_index()), str(duration()) + 's']
+            return  [ True, str(video_index()), str(duration()) + 's', ' ']
           
           
           if trigger_id == 'delete-addclick.n_clicks':
@@ -2229,7 +2215,9 @@ try:
             if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
             if not os.path.isdir('/content/assets'): os.mkdir('/content/assets')
             
-                    
+            [os.remove(os.path.join('/tmp',i)) for i in os.listdir('/tmp') if i.endswith('.npy')]
+
+            
             if not os.path.isfile('/tmp/model.txt'):
         
                 convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
@@ -2238,10 +2226,10 @@ try:
                 f.write(convert_id)
                 f.close()
                 
-
+            time.sleep(1)
             
             
-            return  [ True, str(video_index()), str(duration()) + 's']
+            return  [ True, str(video_index()), str(duration()) + 's', ' ']
 
           elif trigger_id == 'Reset-addclick.n_clicks':
           
@@ -2252,17 +2240,17 @@ try:
 
             output = 'You have added total ' + str(video_index()) + ' video(s). You can add more videos' 
 
-            return  [True, str(video_index()), str(duration()) + 's']
+            return  [True, str(video_index()), str(duration()) + 's',  dash.no_update]
 
           elif t1 == 'True' or t2 == 'True':
 
             output = 'You have added total ' + str(video_index()) + ' video(s). You can add more videos' 
             ##########print ('ffff')
 
-            return [ False, str(video_index()), str(duration()) + 's']
+            return [ False, str(video_index()), str(duration()) + 's', dash.no_update]
 
           else:
-            return [s2, s3, s4]
+            return [s2, s3, s4, dash.no_update]
 
 
 
@@ -3115,10 +3103,10 @@ try:
 
                         ],
                       
-            [Input('start_text_continue', 'n_clicks'),Input('interval-1', 'n_intervals'), Input('confirm_delete', 'children')],
+            [Input('start_text_continue', 'n_clicks'),Input('interval-1', 'n_intervals'), Input('confirm_delete', 'children'),Input('temp_delete', 'children') ],
             [State("toggle-add-face", "is_open"), State('start_text_input', 'value'), State("start_text_input", "disabled"), State("face_type_select", "value"), State("interval-1", "interval")])
 
-        def update_start(n, intval,confirm_delete, t1, model_name, d3, s1, s4):
+        def update_start(n, intval,confirm_delete, aadss, t1, model_name, d3, s1, s4):
 
         
 
@@ -3148,6 +3136,7 @@ try:
           global open_choose_box
 
           trigger_id = dash.callback_context.triggered[0]['prop_id']
+          #print (trigger_id)
           
           if n is not None and trigger_id == 'start_text_continue.n_clicks':
           
@@ -3187,11 +3176,7 @@ try:
               global run
 
               if threadon and trigger_id == 'start_text_continue.n_clicks':
-                
-                
-                
-                
-              
+        
                 thr = Process(target = Main, args=(gui_queue, labelsdict, run, model_name,))
                 
                 thr.start()
@@ -3205,9 +3190,10 @@ try:
                 ##########print ( 'ddabjhjkasfawbwfbjbkwfbkfabkfbkfafbkkbaf')
 
                 threadon = False
+                
                 start_text_continue_disabled = True
                 start_text_input_disabled = True
-                face_type_select_disabled = True
+                face_type_select_disabled =True
 
               if not threadon_:
               
@@ -3327,7 +3313,7 @@ try:
                 
                 
                 
-                print (message)
+                #print (message)
                 
                 if message.startswith('#ID-'):
                 
@@ -3339,11 +3325,12 @@ try:
                 
                 
                 if not no_loop:
-                
+
                   try:
                   
                     f = open('/tmp/model.txt','r')
                     convert_id = f.read()
+                    
                     f.close()
                     
                     title_project = html.Div(dbc.InputGroup(
@@ -3364,11 +3351,15 @@ try:
                     
               
               
+              
+              
+              
               if not threadon:
               
                   try:
                     
                     header = watch.get_interval()
+                    
                     
                     try:
                         iters = str(open('/content/workspace/model/iteration.txt','r').read())
@@ -3378,6 +3369,9 @@ try:
                     except:
         
                         itt = ''
+                        
+                        
+                    
                      
                   except:
                   
@@ -3385,10 +3379,17 @@ try:
                     header = ''
                     
                     itt = ''
+                    
+                    
+                  #Progress_header = '['+header+'] '+itt+msglist
                   
                   if msglist != ':Stopped:': 
                     
                     Progress_header = '['+header+'] '+itt+msglist
+                    
+                  else:
+                  
+                    Progress_header = '['+header+'] '+' Starting...'
                   
                   
               
@@ -3426,16 +3427,16 @@ try:
               
               #return [  status_children,Progress_header, start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled,  modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
               
-          #else:
+          else:
           
               #status_children = 'Start the Process'
               
               #Progress_header = 'Choose an option'
               
               
-              #start_text_continue_disabled = False
-              #start_text_input_disabled = d3
-              #face_type_select_disabled = False
+              start_text_continue_disabled = False
+              start_text_input_disabled = False
+              face_type_select_disabled = False
           
               #return [  status_children, Progress_header , start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled,  modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
         
@@ -3448,7 +3449,7 @@ try:
         
         def update(cvt):
         
-            print (cvt)
+            #print (cvt)
         
             trigger_id = dash.callback_context.triggered[0]['prop_id']
             
@@ -3650,14 +3651,14 @@ try:
                        Input('blursharpen_amount_', 'value'),
                        Input('image_denoise_power_', 'value'),
                        Input('color_degrade_power_', 'value'),
-                       Input('okay_merge', 'n_clicks')
+                       Input('okay_merge', 'n_clicks'), Input('convert_tabs_1', 'active_tab')
                ],# [State('size_step', 'value'),
                  #   State('shift_step', 'value')]
                        )    
                        
         def update_convert_image(v_plus_size,h_minus_size, h_plus_size, v_minus_size , v_plus_shift, h_minus_shift, h_plus_shift, v_minus_shift, refresh_img,
                                  mask_mode_, face_type_, mode_, Erode_,Blur_ ,color_mode_, motion_blur_power_, blursharpen_amount_,
-                                image_denoise_power_,color_degrade_power_,okay_merge):
+                                image_denoise_power_,color_degrade_power_,okay_merge, jdkd):
 
             
             trigger_id = dash.callback_context.triggered[0]['prop_id']
@@ -3762,7 +3763,7 @@ try:
                        
                 result, _ = Merger_tune.MergeMaskedFace_test(npy_, cfg_merge)
                 
-                
+                #print (result.shape)
                 
                 if trigger_id == 'okay_merge.n_clicks':
                 
@@ -3848,11 +3849,11 @@ try:
                 try:
                 
                     #print (time.time() - os.path.getctime(glob.glob("/content/assets/*mp4")[0]))
-                    if secss <=5:
+                    if secss <=20:
                     
                         #print ('updates')
                         
-                        return [done, os.path.join('/assets', glob.glob("/content/assets/*mp4")[0].split('/')[-1]),'Preview'+sec_s]
+                        return [done, os.path.join('/assets', glob.glob("/content/assets/*mp4")[0].split('/')[-1]),sec_s]
                     
                     else:
                         return [done, dash.no_update,sec_s]
@@ -3951,6 +3952,8 @@ try:
                     fid = getoutput("xattr -p 'user.drive.id' '"+tar_di+"'")
                     
                     if len(fid)>30:
+                    
+                        done = 100
                     
                         url = 'https://docs.google.com/file/d/'+fid
 
