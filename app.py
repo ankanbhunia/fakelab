@@ -2925,6 +2925,13 @@ def update_images(ints,kd):
     if trigger_id == 'delete-addclick.n_clicks':
     
         killall()
+        
+        global thread_list
+    
+       
+        for i in thread_list:
+
+            i.terminate() 
                 
         if os.path.isdir('/content/workspace/'):
             shutil.rmtree('/content/workspace/')
@@ -3089,10 +3096,10 @@ def display_page(n):
                 ],
               
     [Input('start_text_continue', 'n_clicks'),Input('interval-1', 'n_intervals'), Input('confirm_delete', 'children'),Input('temp_delete', 'children'), Input('Resetal-addclick', 'n_clicks'),
-      Input('delete-addclick', 'n_clicks')],
+      Input('delete-addclick', 'n_clicks'), Input('convert_start', 'n_clicks')],
     [State("toggle-add-face", "is_open"), State('start_text_input', 'value'), State("start_text_input", "disabled"), State("face_type_select", "value"), State("interval-1", "interval")])
 
-def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, t1, model_name, d3, s1, s4):
+def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, dddw,t1, model_name, d3, s1, s4):
 
 
 
@@ -3166,7 +3173,7 @@ def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, t1, model_name, d3,
         thr = Process(target = Main, args=(gui_queue, labelsdict, run, model_name,))
         
         thr.start()
-        #thread_list.append(thr)
+        thread_list.append(thr)
         
 
         #threading.Thread(target=Main, args=(gui_queue,), daemon=True).start()
@@ -3386,20 +3393,7 @@ def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, t1, model_name, d3,
             
             #return [status_children, Progress_header, start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled, modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
          
-      if message:
-      
-            if message.startswith(':Stopped:'):
-            
-                start_text_continue_disabled = False
-                start_text_input_disabled = False
-                face_type_select_disabled =False
-                threadon = True
-                threadon_ = True
-                no_loop = False
-                Progress_header = 'Choose an option'
-                status_children = 'Start the Process'
-                
-                
+ 
         
         
         
@@ -3425,7 +3419,7 @@ def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, t1, model_name, d3,
       #return [  status_children, Progress_header , start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled,  modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
     
     
-  if trigger_id == 'Resetal-addclick.n_clicks' or trigger_id == 'delete-addclick.n_clicks':
+  if trigger_id == 'Resetal-addclick.n_clicks' or trigger_id == 'delete-addclick.n_clicks' or trigger_id == 'convert_start.n_clicks':
 
     
 
