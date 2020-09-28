@@ -1,8 +1,7 @@
 
 
-from IPython.display import clear_output
 import zipfile
-import tqdmA
+import tqdm
 from subprocess import getoutput
 import imutils
 import dash
@@ -16,7 +15,6 @@ import threading
 import cv2
 import time
 import os
-import matplotlib.pyplot as plt
 import base64
 import dash_daq as daq
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
@@ -29,7 +27,6 @@ from moviepy.editor import VideoFileClip, concatenate_videoclips
 import sys
 import queue
 
-from google.colab import drive
 import random
 import string
 from multiprocessing import Process, Queue
@@ -57,7 +54,6 @@ cols = ''
 import sys  
 sys.path.append('/content/DeepFaceLab')
 from merger import Merger_tune
-import matplotlib.pyplot as plt
 import numpy as np
 from facelib import FaceType
 global labelsdict
@@ -610,7 +606,7 @@ def Main(q, labelsdict, run, option_id):
 
             q.put('Training In Progress')
 
-            clear_output()
+             
             p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
             
             
@@ -662,7 +658,7 @@ def Main(q, labelsdict, run, option_id):
             thr2.daemon=True   
             thr2.start()
             thread_list.append(thr2)
-            clear_output()
+             
             q.put('Training In Progress')
 
             thr3 = Process(target = get_preview, args=())
@@ -776,7 +772,7 @@ def Main(q, labelsdict, run, option_id):
                 thr2.daemon=True   
                 thr2.start()
                 thread_list.append(thr2)
-                clear_output()
+                 
                 q.put('Training In Progress')
                 thr3 = Process(target = get_preview, args=())
                 thr3.daemon=True   
@@ -931,7 +927,7 @@ def Main(q, labelsdict, run, option_id):
                     thr2.daemon=True   
                     thr2.start()
                     thread_list.append(thr2)
-                    clear_output()
+                     
                     q.put('Training In Progress')
 
                     thr3 = Process(target = get_preview, args=())
@@ -1010,7 +1006,7 @@ def Main(q, labelsdict, run, option_id):
             thr3.daemon=True   
             thr3.start()
             thread_list.append(thr3)
-            clear_output()
+             
             q.put('Training In Progress')
 
 
@@ -1074,7 +1070,7 @@ def Main(q, labelsdict, run, option_id):
             thr3.start()
             thread_list.append(thr3)
             
-            clear_output()
+             
             
             q.put('Training In Progress')
 
