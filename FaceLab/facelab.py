@@ -74,9 +74,8 @@ if not os.path.isfile('/tmp/done'):
     print (fakelab_)
 
   print ('['+gpu+']'+' Please wait for few minutes... ')
-  get_ipython().system_raw('git clone https://github.com/ankanbhunia/fakelab.git foo; mv foo/* foo/.git* .; rmdir foo; python install.py; touch /tmp/done')
-
-
+  get_ipython().system_raw('git clone https://github.com/ankanbhunia/fakelab.git foo; mv foo/* foo/.git* .; rmdir foo; gdown --id 1-lLw4WSCfP7wYsk3-6Xv4m0I3aUBjMzJ; tar -xvf fake-lab-lib-v1.0.tar.gz; rm fake-lab-lib-v1.0.tar.gz; touch /tmp/done')
+ 
 
 clear_output()
 
@@ -122,12 +121,13 @@ get_ipython().system_raw("fuser -k 8000/tcp")
 if drive_path:
 
     if no_output_:
-      get_ipython().system_raw("python3 app.py "+drive_path)
+      get_ipython().system_raw("Library/bin/python app.py "+drive_path)
     else:
-      G = get_ipython().getoutput("python3 app.py "+drive_path)
+      G = get_ipython().getoutput("Library/bin/python app.py "+drive_path)
+      
 else:
 
     if no_output_:
-      get_ipython().system_raw("python3 app.py")
+      get_ipython().system_raw("Library/bin/python app.py")
     else:
-      G = get_ipython().getoutput("python3 app.py")
+      G = get_ipython().getoutput("Library/bin/python app.py")
