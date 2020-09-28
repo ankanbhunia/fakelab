@@ -13,7 +13,7 @@ import models
 from core.interact import interact as io
 
 import tensorflow as tf
-gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.95)
 sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
 def trainerThread (s2c, c2s, e,

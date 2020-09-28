@@ -23,15 +23,6 @@ else:
 
 for i in f:
   copyfile(i, os.path.join('/content/workspace/preview/aligned/', i.split('/')[-1]))
-f = glob.glob('/content/workspace/data_dst/*g')
+  copyfile(os.path.join('/content/workspace/data_dst/',i.split('/')[-1].split('_')[0]+'.png'), 
+           os.path.join('/content/workspace/preview/', i.split('/')[-1].split('_')[0]+'.png'))
 
-if len(f)>50:
-  h = np.arange(0,50,2)
-  f = np.array(sorted(f)[:50])[h]
-
-else:
-  h = np.arange(0,len(f),2)
-  f = np.array(sorted(f)[:len(f)])[h]
-
-for i in f:
-  copyfile(i, os.path.join('/content/workspace/preview/', i.split('/')[-1]))
