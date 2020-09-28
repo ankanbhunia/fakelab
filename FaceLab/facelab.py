@@ -96,6 +96,7 @@ if xxx:
     get_ipython().system_raw("pip3 install pyngrok")
     get_ipython().system_raw("ngrok authtoken " + xxx)
     from pyngrok import ngrok
+    ngrok.kill()
     print("Project URL: "+ngrok.connect(port = '8000'))
 
   except:

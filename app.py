@@ -28,9 +28,7 @@ from mhyt import yt_download
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 import sys
 import queue
-from subprocess import getoutput
-from IPython.display import HTML
-from IPython.display import HTML
+
 from google.colab import drive
 import random
 import string
