@@ -2111,7 +2111,7 @@ try:
              Input('temp2', 'children'),
              Input('Reset-addclick', 'n_clicks'),
              Input('Resetal-addclick', 'n_clicks'),
-             Input('delete-addclick', 'n_clicks')],
+            ],
 
              [
              State("Reset-addclick", "disabled"),
@@ -2119,7 +2119,7 @@ try:
              State("n_sec_video", "children")]
              )
 
-        def update_details(t1, t2, n, n1, n2, s2, s3, s4):
+        def update_details(t1, t2, n, n1, s2, s3, s4):
 
           ##print'######################################################')
           #########print (dash.callback_context.triggered[0]['prop_id'], currentframe().f_lineno)
@@ -2188,48 +2188,7 @@ try:
                 
             return  [ True, str(video_index()), str(duration()) + 's', ' ']
           
-          
-          if trigger_id == 'delete-addclick.n_clicks':
-            
-           
-            
-            
-            #tar_vids = []
-            
-            #shutil.rmtree('videos/Source/Final'); os.mkdir('videos/Source/Final')
-
-         
-            killall()
-                    
-            if os.path.isdir('/content/workspace/'):
-                shutil.rmtree('/content/workspace/')
-                
-            
-            if os.path.isdir('/content/assets'):
-                shutil.rmtree('/content/assets')
-            
-            
-            if not os.path.isdir('/content/workspace'): os.mkdir('/content/workspace')
-            if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
-            if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
-            if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
-            if not os.path.isdir('/content/assets'): os.mkdir('/content/assets')
-            
-            [os.remove(os.path.join('/tmp',i)) for i in os.listdir('/tmp') if i.endswith('.npy')]
-
-            
-            if not os.path.isfile('/tmp/model.txt'):
-        
-                convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
-                        
-                f = open('/tmp/model.txt','w+')
-                f.write(convert_id)
-                f.close()
-                
-            time.sleep(1)
-            
-            
-            return  [ True, str(video_index()), str(duration()) + 's', ' ']
+      
 
           elif trigger_id == 'Reset-addclick.n_clicks':
           
@@ -2965,49 +2924,87 @@ try:
 
         @app.callback([Output("preview_imgs", "children"), Output("preview_graph", "children")],
                       
-            [Input('interval-2', 'n_intervals')])
+            [Input('interval-2', 'n_intervals'),Input('delete-addclick', 'n_clicks')])
 
-        def update_images(ints):
+        def update_images(ints,kd):
             ##print'######################################################')
             #########print (dash.callback_context.triggered[0]['prop_id'], currentframe().f_lineno)
             ##print'######################################################')
+            
+            
+            trigger_id = dash.callback_context.triggered[0]['prop_id']
+            
+            if trigger_id == 'delete-addclick.n_clicks':
+            
+                killall()
+                        
+                if os.path.isdir('/content/workspace/'):
+                    shutil.rmtree('/content/workspace/')
+                    
+                
+                if os.path.isdir('/content/assets'):
+                    shutil.rmtree('/content/assets')
+                
+                
+                if not os.path.isdir('/content/workspace'): os.mkdir('/content/workspace')
+                if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
+                if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
+                if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
+                if not os.path.isdir('/content/assets'): os.mkdir('/content/assets')
+                
+                [os.remove(os.path.join('/tmp',i)) for i in os.listdir('/tmp') if i.endswith('.npy')]
 
-
-            jpgs = glob.glob('workspace/model/*.jpg')
+                
+                #if not os.path.isfile('/tmp/model.txt'):
             
-            ##########print (jpgs)
+                #convert_id = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
+                #        
+                #f = open('/tmp/model.txt','w+')
+                #f.write(convert_id)
+                #f.close()
+                
+                time.sleep(1)
             
-            if len(jpgs)>1:
-                
-                img1 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD.jpg')
-                img2 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
-                img3 = np.concatenate([img1[100:356, 2*256:3*256], img2[100:356, 2*256:3*256], img2[100:356, 4*256:5*256], img1[100:356, 4*256:5*256]],1)
-                img3 = imutils.resize(img3, height = 128)
-                
-                
-                
-                
-                ret, img3 = cv2.imencode('.jpg', img3)
-                
-                #p = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
-                #p1 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD.jpg')
-                img3 = base64.b64encode(img3)
-                src3 = 'data:image/jpg;base64,{}'.format(img3.decode())
-                
-                img4 = cv2.resize(255 - img1[:100], (1280,350))
-                ret, img4 = cv2.imencode('.jpg', img4)
-                
-                #p = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
-                #p1 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD.jpg')
-                img4 = base64.b64encode(img4)
-                src4 = 'data:image/jpg;base64,{}'.format(img4.decode())
-                
-                return  [html.Img(id = 'Mask', src = src3, style = {'width' : '100%', 'height' : '100%'}), 
-                html.Img(id = 'Mask_1', src = src4, style = {'width' : '100%', 'height' : '100%'})]
-            
-            else:
             
                 return ['', '']
+                
+            else:
+
+                jpgs = glob.glob('workspace/model/*.jpg')
+                
+                ##########print (jpgs)
+                
+                if len(jpgs)>1:
+                    
+                    img1 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD.jpg')
+                    img2 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
+                    img3 = np.concatenate([img1[100:356, 2*256:3*256], img2[100:356, 2*256:3*256], img2[100:356, 4*256:5*256], img1[100:356, 4*256:5*256]],1)
+                    img3 = imutils.resize(img3, height = 128)
+                    
+                    
+                    
+                    
+                    ret, img3 = cv2.imencode('.jpg', img3)
+                    
+                    #p = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
+                    #p1 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD.jpg')
+                    img3 = base64.b64encode(img3)
+                    src3 = 'data:image/jpg;base64,{}'.format(img3.decode())
+                    
+                    img4 = cv2.resize(255 - img1[:100], (1280,350))
+                    ret, img4 = cv2.imencode('.jpg', img4)
+                    
+                    #p = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
+                    #p1 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD.jpg')
+                    img4 = base64.b64encode(img4)
+                    src4 = 'data:image/jpg;base64,{}'.format(img4.decode())
+                    
+                    return  [html.Img(id = 'Mask', src = src3, style = {'width' : '100%', 'height' : '100%'}), 
+                    html.Img(id = 'Mask_1', src = src4, style = {'width' : '100%', 'height' : '100%'})]
+                
+                else:
+                
+                    return ['', '']
 
             
 
@@ -3046,9 +3043,9 @@ try:
             
         @app.callback(
             Output("toggle-add-right_frame", "is_open"),
-            [Input("interval-1", "n_intervals")]
+            [Input("interval-1", "n_intervals"), Input('delete-addclick', 'n_clicks')]
         )
-        def open_toast1(n):
+        def open_toast1(n,dlld):
             ##print'######################################################')
             #########print (dash.callback_context.triggered[0]['prop_id'], currentframe().f_lineno)
             ##print'######################################################')
@@ -3103,10 +3100,11 @@ try:
 
                         ],
                       
-            [Input('start_text_continue', 'n_clicks'),Input('interval-1', 'n_intervals'), Input('confirm_delete', 'children'),Input('temp_delete', 'children') ],
+            [Input('start_text_continue', 'n_clicks'),Input('interval-1', 'n_intervals'), Input('confirm_delete', 'children'),Input('temp_delete', 'children'), Input('Resetal-addclick', 'n_clicks'),
+             Input('delete-addclick', 'n_clicks')],
             [State("toggle-add-face", "is_open"), State('start_text_input', 'value'), State("start_text_input", "disabled"), State("face_type_select", "value"), State("interval-1", "interval")])
 
-        def update_start(n, intval,confirm_delete, aadss, t1, model_name, d3, s1, s4):
+        def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, t1, model_name, d3, s1, s4):
 
         
 
@@ -3194,6 +3192,32 @@ try:
                 start_text_continue_disabled = True
                 start_text_input_disabled = True
                 face_type_select_disabled =True
+                
+                try:
+                  
+                    f = open('/tmp/model.txt','r')
+                    convert_id = f.read()
+
+                    f.close()
+                    
+                except:
+                
+                    convert_id = ''
+
+                title_project = html.Div(dbc.InputGroup(
+                                [
+                                        dbc.InputGroupAddon("Training ID", addon_type="prepend"),
+                                        dbc.Input(placeholder=convert_id, id = 'convert_id_place'),
+                                    ],
+                                    className="mb-3",
+                                ), style = {'width': '250px'})
+                  
+                status_children = title_project#html.Div(dbc.Row([dbc.Col('Training ') , dbc.Col(title_project)], no_gutters = True))
+
+
+
+                
+              
 
               if not threadon_:
               
@@ -3324,30 +3348,7 @@ try:
                     
                 
                 
-                if not no_loop:
-
-                  try:
                   
-                    f = open('/tmp/model.txt','r')
-                    convert_id = f.read()
-                    
-                    f.close()
-                    
-                    title_project = html.Div(dbc.InputGroup(
-                                    [
-                                            dbc.InputGroupAddon("Training ID", addon_type="prepend"),
-                                            dbc.Input(placeholder=convert_id, id = 'convert_id_place'),
-                                        ],
-                                        className="mb-3",
-                                    ), style = {'width': '250px'})
-                      
-                    status_children = title_project#html.Div(dbc.Row([dbc.Col('Training ') , dbc.Col(title_project)], no_gutters = True))
-                    
-                    no_loop = True
-                    
-                  except:
-                    
-                    status_children =  ['Training Starting...']
                     
               
               
@@ -3393,26 +3394,7 @@ try:
                   
                   
               
-              if message:
-              
-              
-                if message.startswith(':Stopped:'):
-                
-                    modal_error_details = message
-                    
-                    status_children = 'Training Stopped'
-                    message = ''
-                    #time.sleep(2)
-                    threadon = True
-                    threadon_ = True
-                    no_loop = False
-                    Progress_header = 'Choose an option'
-                    
-                    
-                    start_text_continue_disabled = False
-                    start_text_input_disabled = False
-                    face_type_select_disabled = False
-                    
+                   
                     
                     #return [status_children, Progress_header, start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled, modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
                     
@@ -3437,17 +3419,34 @@ try:
               start_text_continue_disabled = False
               start_text_input_disabled = False
               face_type_select_disabled = False
-          
+              status_children = 'Training Stopped'
+              
+              
+              
               #return [  status_children, Progress_header , start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled,  modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
-        
-        
+           
+           
+          if trigger_id == 'Resetal-addclick.n_clicks' or trigger_id == 'delete-addclick.n_clicks':
+    
+           
+
+            
+            start_text_continue_disabled = False
+            start_text_input_disabled = False
+            face_type_select_disabled =False
+            threadon = True
+            threadon_ = True
+            no_loop = False
+            Progress_header = 'Choose an option'
+            status_children = 'Training Stopped'
+
           return [  status_children, Progress_header , start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled,  modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
             
         
         
-        @app.callback(Output('convert_id_place', 'placeholder'), [Input('convert_id_place', 'value')])
+        @app.callback(Output('convert_id_place', 'placeholder'), [Input('convert_id_place', 'value'), Input('interval-1', 'n_intervals')])
         
-        def update(cvt):
+        def update(cvt,eioji):
         
             #print (cvt)
         
@@ -3487,7 +3486,17 @@ try:
                     
                 return convert_id
             else:
-                return dash.no_update
+            
+                try:
+                    f = open('/tmp/model.txt','r')
+                    convert_id = f.read()
+                    f.close()
+                
+            
+                    return convert_id
+                    
+                except:
+                    return dash.no_update 
         
         
         @app.callback([Output('src_face_img', 'src'),Output('src_frames_nos', 'children'), Output('add_src_face', 'disabled'), Output('src_slider', 'max'), Output('src_slider', 'marks')],
