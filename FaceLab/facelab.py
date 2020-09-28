@@ -93,7 +93,7 @@ if xxx:
 
   try:
 
-    get_ipython().system_raw("pip install pyngrok")
+    get_ipython().system_raw("pip3 install pyngrok")
     get_ipython().system_raw("ngrok authtoken " + xxx)
     from pyngrok import ngrok
     print("Project URL: "+ngrok.connect(port = '8000'))
