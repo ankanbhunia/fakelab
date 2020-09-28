@@ -358,8 +358,8 @@ def Convert():
     if not os.path.isdir('workspace/data_dst/merged'): os.mkdir('workspace/data_dst/merged')
     if not os.path.isdir('workspace/data_dst/merged_mask'): os.mkdir('workspace/data_dst/merged_mask')
 
-    os.system('echo | python DeepFaceLab/main.py merge --input-dir workspace/data_dst --output-dir workspace/data_dst/merged --output-mask-dir workspace/data_dst/merged_mask --aligned-dir workspace/data_dst/aligned --model-dir workspace/model --model SAEHD')
-    os.system('echo | python DeepFaceLab/main.py videoed video-from-sequence_ --input-dir workspace/data_dst/merged --output-file workspace/'+output_name+' --reference-file workspace/data_dst.mp4 --include-audio')
+    os.system('echo | Library/bin/python DeepFaceLab/main.py merge --input-dir workspace/data_dst --output-dir workspace/data_dst/merged --output-mask-dir workspace/data_dst/merged_mask --aligned-dir workspace/data_dst/aligned --model-dir workspace/model --model SAEHD')
+    os.system('echo | Library/bin/python DeepFaceLab/main.py videoed video-from-sequence_ --input-dir workspace/data_dst/merged --output-file workspace/'+output_name+' --reference-file workspace/data_dst.mp4 --include-audio')
     os.system('cp /content/workspace/'+output_name+' '+drive_path)
     # need to install xattr
     
@@ -405,8 +405,8 @@ def get_preview():
             os.system('rm -r /content/workspace/preview/merged')
             os.mkdir('/content/workspace/preview/merged')
         
-            os.system("printf '0\nCPU\n' | python DeepFaceLab/main.py merge --input-dir /content/workspace/preview --output-dir /content/workspace/preview/merged --output-mask-dir /content/workspace/preview/merged_mask --aligned-dir /content/workspace/preview/aligned --model-dir workspace/model --model SAEHD")
-            os.system("printf '10\n' | python DeepFaceLab/main.py videoed video-from-sequence_  --input-dir /content/workspace/preview/merged --output-file workspace/result_preview.mp4")
+            os.system("printf '0\nCPU\n' | Library/bin/python DeepFaceLab/main.py merge --input-dir /content/workspace/preview --output-dir /content/workspace/preview/merged --output-mask-dir /content/workspace/preview/merged_mask --aligned-dir /content/workspace/preview/aligned --model-dir workspace/model --model SAEHD")
+            os.system("printf '10\n' | Library/bin/python DeepFaceLab/main.py videoed video-from-sequence_  --input-dir /content/workspace/preview/merged --output-file workspace/result_preview.mp4")
             
             import moviepy.editor as mp
 
@@ -510,8 +510,8 @@ def Main(q, labelsdict, run, option_id):
           
             q.put  ('[4/7] Extracting frames ')
             
-            p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
-                subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
+            p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
+                subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
 
             p_ = [p[0].wait(), p[1].wait()]
             
@@ -525,8 +525,8 @@ def Main(q, labelsdict, run, option_id):
                 
             q.put  ('[5/7] Extracting faces ')
             
-            p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
-                subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
+            p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
+                subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
 
             p_ = [p[0].wait(), p[1].wait()]
             
@@ -556,7 +556,7 @@ def Main(q, labelsdict, run, option_id):
                 
                     break
 
-            os.system('python /content/DeepFaceLab/preview.py')
+            os.system('Library/bin/python /content/DeepFaceLab/preview.py')
             
             #q.put  ('Enhancing Faces ')
             
@@ -573,7 +573,7 @@ def Main(q, labelsdict, run, option_id):
             
             q.put  ('[7/7] Extracting face masks ')
             
-            p = os.system('python face_seg.py')
+            p = os.system('Library/bin/python face_seg.py')
             if p != 0: 
                 q.put('Error while extracting face masks! ')
                 return False
@@ -607,7 +607,7 @@ def Main(q, labelsdict, run, option_id):
             q.put('Training In Progress')
 
              
-            p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
+            p = os.system('echo | Library/bin/python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
             
             
             
@@ -666,7 +666,7 @@ def Main(q, labelsdict, run, option_id):
             thr3.start()
             thread_list.append(thr3)
 
-            p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
+            p = os.system('echo | Library/bin/python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
             
 
             q.put(':Stopped:')
@@ -686,8 +686,8 @@ def Main(q, labelsdict, run, option_id):
 
                 q.put  ('[2/5] Extracting frames ')
             
-                p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
-                    subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
+                p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
+                    subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
 
                 p_ = [p[0].wait(), p[1].wait()]
                 
@@ -701,8 +701,8 @@ def Main(q, labelsdict, run, option_id):
                     
                 q.put  ('[3/5] Extracting faces ')
                 
-                p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
-                    subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
+                p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
+                    subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
 
                 p_ = [p[0].wait(), p[1].wait()]
                 
@@ -733,7 +733,7 @@ def Main(q, labelsdict, run, option_id):
                         break
 
                 
-                os.system('python /content/DeepFaceLab/preview.py')
+                os.system('Library/bin/python /content/DeepFaceLab/preview.py')
                 #q.put  ('Enhancing Faces ')
             
                 #p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_src/aligned", shell=True),
@@ -749,7 +749,7 @@ def Main(q, labelsdict, run, option_id):
                 
                 q.put  ('[5/5] Extracting face masks ')
                 
-                p = os.system('python face_seg.py')
+                p = os.system('Library/bin/python face_seg.py')
                 if p != 0: 
                     q.put('Error while extracting face masks! ')
                     return False
@@ -779,7 +779,7 @@ def Main(q, labelsdict, run, option_id):
                 thr3.start()
                 thread_list.append(thr3)
 
-                p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
+                p = os.system('echo | Library/bin/python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
         
                 q.put(':Stopped:')
                     
@@ -841,8 +841,8 @@ def Main(q, labelsdict, run, option_id):
                     
                     q.put  ('[4/7] Extracting frames ')
             
-                    p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
-                        subprocess.Popen("echo | python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
+                    p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
+                        subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
 
                     p_ = [p[0].wait(), p[1].wait()]
                     
@@ -856,8 +856,8 @@ def Main(q, labelsdict, run, option_id):
                         
                     q.put  ('[5/7] Extracting faces ')
                     
-                    p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
-                        subprocess.Popen("echo | python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
+                    p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
+                        subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
 
                     p_ = [p[0].wait(), p[1].wait()]
                     
@@ -887,7 +887,7 @@ def Main(q, labelsdict, run, option_id):
                         
                             break
 
-                    os.system('python /content/DeepFaceLab/preview.py')
+                    os.system('Library/bin/python /content/DeepFaceLab/preview.py')
                     
                     #q.put  ('Enhancing Faces ')
             
@@ -901,10 +901,10 @@ def Main(q, labelsdict, run, option_id):
                     #    return False    
                     
                                     
-                    os.system('python /content/DeepFaceLab/preview.py')
+                    os.system('Library/bin/python /content/DeepFaceLab/preview.py')
                     q.put  ('[7/7] Extracting face masks ')
                     
-                    p = os.system('python face_seg.py')
+                    p = os.system('Library/bin/python face_seg.py')
                     if p != 0: 
                         q.put('Error while extracting face masks! ')
                         return False
@@ -934,7 +934,7 @@ def Main(q, labelsdict, run, option_id):
                     thr3.daemon=True   
                     thr3.start()
                     thread_list.append(thr3)
-                    p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
+                    p = os.system('echo | Library/bin/python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
                   
                     q.put(':Stopped:')
                         
@@ -979,7 +979,7 @@ def Main(q, labelsdict, run, option_id):
                 if file.startswith('workspace/model/'):
                     archive.extract(file, '/content/')
                     
-            os.system('python /content/DeepFaceLab/preview.py')
+            os.system('Library/bin/python /content/DeepFaceLab/preview.py')
                     
             
             q.put('[2/2] Loading Workspace')
@@ -1010,7 +1010,7 @@ def Main(q, labelsdict, run, option_id):
             q.put('Training In Progress')
 
 
-            p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
+            p = os.system('echo | Library/bin/python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
 
             q.put(':Stopped:')
                 
@@ -1043,7 +1043,7 @@ def Main(q, labelsdict, run, option_id):
                 
             #os.system('echo A | unzip /content/drive/My\ Drive/'+model_name)
             
-            os.system('python /content/DeepFaceLab/preview.py')
+            os.system('Library/bin/python /content/DeepFaceLab/preview.py')
             
             q.put('[2/2] Loading Workspace')
             
@@ -1075,7 +1075,7 @@ def Main(q, labelsdict, run, option_id):
             q.put('Training In Progress')
 
             
-            p = os.system('echo | python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
+            p = os.system('echo | Library/bin/python DeepFaceLab/main.py train --training-data-src-dir workspace/data_src/aligned --training-data-dst-dir workspace/data_dst/aligned --pretraining-data-dir pretrain --model-dir workspace/model --model SAEHD')
 
             q.put(':Stopped:')
                 
@@ -3385,10 +3385,21 @@ def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, t1, model_name, d3,
             
             
             #return [status_children, Progress_header, start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled, modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
+         
+      if message:
+      
+            if message.startswith(':Stopped:'):
             
-        
-            
-        
+                start_text_continue_disabled = False
+                start_text_input_disabled = False
+                face_type_select_disabled =False
+                threadon = True
+                threadon_ = True
+                no_loop = False
+                Progress_header = 'Choose an option'
+                status_children = 'Start the Process'
+                
+                
         
         
         
@@ -3407,7 +3418,7 @@ def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, t1, model_name, d3,
       start_text_continue_disabled = False
       start_text_input_disabled = False
       face_type_select_disabled = False
-      status_children = 'Training Stopped'
+      status_children = 'Start the Process'
       
       
       
@@ -3426,7 +3437,11 @@ def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, t1, model_name, d3,
     threadon_ = True
     no_loop = False
     Progress_header = 'Choose an option'
-    status_children = 'Training Stopped'
+    status_children = 'Start the Process'
+    
+    
+    
+        
 
   return [  status_children, Progress_header , start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled,  modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
     
@@ -3879,6 +3894,8 @@ def update__(n, interval):
     convert_id = f.read()
     f.close()
         
+    tar_di = os.path.join(drive_path_, 'result_' + convert_id + '.mp4')
+    
     if n and trigger_id=='convert_start.n_clicks':
     
         killall()
@@ -3926,6 +3943,7 @@ def update__(n, interval):
                 
                 
                 
+        if os.path.isfile(tar_di): os.remove(tar_di)
         
         thr = Process(target = Convert, args=())
         thr.daemon=True   
@@ -3940,7 +3958,7 @@ def update__(n, interval):
         
         done =  int((number_of_files/total_number_of_files)*100)
         
-        tar_di = os.path.join(drive_path_, 'result_' + convert_id + '.mp4')
+        
     
         if os.path.isfile(tar_di):
 

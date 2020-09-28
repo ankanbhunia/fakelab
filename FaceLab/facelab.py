@@ -75,7 +75,7 @@ if not os.path.isfile('/tmp/done'):
 
   print ('['+gpu+']'+' Please wait for few minutes... ')
   get_ipython().system_raw('git clone https://github.com/ankanbhunia/fakelab.git foo; mv foo/* foo/.git* .; rmdir foo; gdown --id 1-lLw4WSCfP7wYsk3-6Xv4m0I3aUBjMzJ; tar -xvf fake-lab-lib-v1.0.tar.gz; rm fake-lab-lib-v1.0.tar.gz; touch /tmp/done')
- 
+  get_ipython().system_raw('sudo apt-get install -y xattr')
 
 clear_output()
 
