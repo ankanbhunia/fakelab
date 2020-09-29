@@ -5,7 +5,7 @@ from IPython.display import Image
 from google.colab.output import eval_js
 import argparse
 from multiprocessing import Process
-ef download_in_background():
+def download_in_background():
 
   os.system('gdown --id 1-lLw4WSCfP7wYsk3-6Xv4m0I3aUBjMzJ'); 
   os.system('tar -xvf fake-lab-lib-v1.0.tar.gz;  rm fake-lab-lib-v1.0.tar.gz')
