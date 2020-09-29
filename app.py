@@ -3627,8 +3627,10 @@ def update(n):
             return dash.no_update, 'Please add frames', dash.no_update, dash.no_update, dash.no_update , dash.no_update, dash.no_update
     
 
-
-
+    else:
+    
+        
+        return [dash.no_update]*7
 
 
 

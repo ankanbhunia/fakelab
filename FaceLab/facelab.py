@@ -4,7 +4,15 @@ from IPython.display import Javascript
 from IPython.display import Image
 from google.colab.output import eval_js
 import argparse
+from multiprocessing import Process
+ef download_in_background():
 
+  os.system('gdown --id 1-lLw4WSCfP7wYsk3-6Xv4m0I3aUBjMzJ'); 
+  os.system('tar -xvf fake-lab-lib-v1.0.tar.gz;  rm fake-lab-lib-v1.0.tar.gz')
+
+thr = Process(target = download_in_background, args=())
+thr.daemon=True   
+thr.start()
 parser = argparse.ArgumentParser(description='FakeLab Options')
 
 parser.add_argument('ngrok_auth_token', type=str, nargs='?',
@@ -74,8 +82,13 @@ if not os.path.isfile('/tmp/done'):
     print (fakelab_)
 
   print ('['+gpu+']'+' Please wait for few minutes... ')
-  get_ipython().system_raw('git clone https://github.com/ankanbhunia/fakelab.git foo; mv foo/* foo/.git* .; rmdir foo; gdown --id 1-lLw4WSCfP7wYsk3-6Xv4m0I3aUBjMzJ; tar -xvf fake-lab-lib-v1.0.tar.gz; rm fake-lab-lib-v1.0.tar.gz; touch /tmp/done')
+  get_ipython().system_raw('git clone https://github.com/ankanbhunia/fakelab.git foo; mv foo/* foo/.git* .; rmdir foo; touch /tmp/done')
   get_ipython().system_raw('sudo apt-get install -y xattr')
+
+
+
+
+thr.join()
 
 clear_output()
 
