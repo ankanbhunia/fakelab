@@ -65,8 +65,8 @@ except:
 print (fakelab_)
 
 if not os.path.isfile('/tmp/done'):
-  if not os.path.isdir('/content/drive/'):
-    from google.colab import drive; drive.mount('/content/drive', force_remount=True) 
+  if not os.path.isdir('drive/'):
+    from google.colab import drive; drive.mount('drive', force_remount=True) 
     
     clear_output()
     

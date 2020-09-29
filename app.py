@@ -1,5 +1,4 @@
 
-
 import zipfile
 import tqdm
 from subprocess import getoutput
@@ -26,7 +25,6 @@ from mhyt import yt_download
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 import sys
 import queue
-
 import random
 import string
 from multiprocessing import Process, Queue
@@ -40,7 +38,7 @@ import signal
 import dash_editor_components
 from flask import request
 import sys
-sys.path.append('/content/FaceClust')
+sys.path.append('FaceClust')
 import FaceClust.face_clustering as ffc
 global cvt_id
 cvt_id = None
@@ -52,7 +50,7 @@ from multiprocessing import Process, Value,Manager
 global cols
 cols = ''
 import sys  
-sys.path.append('/content/DeepFaceLab')
+sys.path.append('DeepFaceLab')
 from merger import Merger_tune
 import numpy as np
 from facelib import FaceType
@@ -78,7 +76,7 @@ total_dst_frames_paths = []
 global dst_face_list
 dst_face_list = []
 import sys
-sys.path.append('/content/dash-player')
+sys.path.append('dash-player')
 
 import dash_player
 import argparse
@@ -97,7 +95,7 @@ parser.add_argument('drivepath', type=str, nargs='?',
 
 argss = parser.parse_args()
 if argss.drivepath == None:
-    argss.drivepath = '/content/drive/My Drive/'
+    argss.drivepath = 'drive/My Drive/'
 drive_path_ = argss.drivepath
 drive_path = '\ '.join(drive_path_.split(' '))
 
@@ -163,9 +161,9 @@ def shutdown():
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
 
-if os.path.isfile('/content/DeepFaceLab/settings.py'):
+if os.path.isfile('DeepFaceLab/settings.py'):
 
-    with open('/content/DeepFaceLab/settings.py', 'r') as f:
+    with open('DeepFaceLab/settings.py', 'r') as f:
         
         settings_text = f.read()
             
@@ -191,11 +189,11 @@ def run_cmd(cmd):
 
 thread_list = []
 
-if not os.path.isdir('/content/workspace'): os.mkdir('/content/workspace')
-if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
-if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
-if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
-if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
+if not os.path.isdir('workspace'): os.mkdir('workspace')
+if not os.path.isdir('workspace/data_dst'): os.mkdir('workspace/data_dst')
+if not os.path.isdir('workspace/data_src'): os.mkdir('workspace/data_src')
+if not os.path.isdir('workspace/model'): os.mkdir('workspace/model')
+if not os.path.isdir('workspace/data_dst'): os.mkdir('workspace/data_dst')
 
 
 if not os.path.isfile('/tmp/model.txt'):
@@ -360,7 +358,7 @@ def Convert():
 
     os.system('echo | Library/bin/python DeepFaceLab/main.py merge --input-dir workspace/data_dst --output-dir workspace/data_dst/merged --output-mask-dir workspace/data_dst/merged_mask --aligned-dir workspace/data_dst/aligned --model-dir workspace/model --model SAEHD')
     os.system('echo | Library/bin/python DeepFaceLab/main.py videoed video-from-sequence_ --input-dir workspace/data_dst/merged --output-file workspace/'+output_name+' --reference-file workspace/data_dst.mp4 --include-audio')
-    os.system('cp /content/workspace/'+output_name+' '+drive_path)
+    os.system('cp workspace/'+output_name+' '+drive_path)
     # need to install xattr
     
     ##########print ('###############################' + 'convertion done')
@@ -376,7 +374,7 @@ def save_workspace_data():
   f.close()
   #print ('jjkdhsjksjkdkdkdkdkldkdkdkdlld#@@@@@@@@@@@@@@@@@' + convert_id)
   os.system('zip -r -q workspace_'+convert_id+'.zip workspace'); 
-  os.system('cp /content/workspace_'+convert_id+'.zip '+drive_path)
+  os.system('cp workspace_'+convert_id+'.zip '+drive_path)
   ##########print ('###############################' + 'save_workspace_data')
 
 def save_workspace_model():
@@ -390,7 +388,7 @@ def save_workspace_model():
     f = open('/tmp/model.txt','r')
     convert_id = f.read()
     f.close()
-    os.system('zip -ur workspace_'+convert_id+'.zip workspace/model'); os.system('cp /content/workspace_'+convert_id+'.zip '+drive_path)
+    os.system('zip -ur workspace_'+convert_id+'.zip workspace/model'); os.system('cp workspace_'+convert_id+'.zip '+drive_path)
     ##########print ('###############################' + 'save_workspace_model')
     
     
@@ -400,25 +398,25 @@ def get_preview():
 
     while 1:
     
-        if len(os.listdir('/content/workspace/model'))>5:
+        if len(os.listdir('workspace/model'))>5:
             
-            os.system('rm -r /content/workspace/preview/merged')
-            os.mkdir('/content/workspace/preview/merged')
+            os.system('rm -r workspace/preview/merged')
+            os.mkdir('workspace/preview/merged')
         
-            os.system("printf '0\nCPU\n' | Library/bin/python DeepFaceLab/main.py merge --input-dir /content/workspace/preview --output-dir /content/workspace/preview/merged --output-mask-dir /content/workspace/preview/merged_mask --aligned-dir /content/workspace/preview/aligned --model-dir workspace/model --model SAEHD")
-            os.system("printf '10\n' | Library/bin/python DeepFaceLab/main.py videoed video-from-sequence_  --input-dir /content/workspace/preview/merged --output-file workspace/result_preview.mp4")
+            os.system("printf '0\nCPU\n' | Library/bin/python DeepFaceLab/main.py merge --input-dir workspace/preview --output-dir workspace/preview/merged --output-mask-dir workspace/preview/merged_mask --aligned-dir workspace/preview/aligned --model-dir workspace/model --model SAEHD")
+            os.system("printf '10\n' | Library/bin/python DeepFaceLab/main.py videoed video-from-sequence_  --input-dir workspace/preview/merged --output-file workspace/result_preview.mp4")
             
             import moviepy.editor as mp
 
-            if not os.path.isdir('/content/assets'): os.mkdir('/content/assets')
+            if not os.path.isdir('assets'): os.mkdir('assets')
             
-            if os.path.isfile("/content/workspace/result_preview.mp4"):
-                clip = mp.VideoFileClip("/content/workspace/result_preview.mp4")
+            if os.path.isfile("workspace/result_preview.mp4"):
+                clip = mp.VideoFileClip("workspace/result_preview.mp4")
                 clip_resized = clip.resize(height=360) # make the height 360px ( According to moviePy documenation The width is then computed so that the width/height ratio is conserved.)
                 convert_id_ = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
-                [os.remove(i) for i in glob.glob("/content/assets/*mp4")]
+                [os.remove(i) for i in glob.glob("assets/*mp4")]
                 
-                clip_resized.write_videofile("/content/assets/result_preview"+convert_id_+".mp4")
+                clip_resized.write_videofile("assets/result_preview"+convert_id_+".mp4")
             else:
             
                 #print ('No file found')
@@ -461,13 +459,13 @@ def Main(q, labelsdict, run, option_id):
         
         if len(src_vids_clip)>0 and len(tar_vids_clip)>0:    
                 
-            if os.path.isdir('/content/workspace/'):
-                shutil.rmtree('/content/workspace/')
+            if os.path.isdir('workspace/'):
+                shutil.rmtree('workspace/')
 
-            if not os.path.isdir('/content/workspace'): os.mkdir('/content/workspace')
-            if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
-            if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
-            if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
+            if not os.path.isdir('workspace'): os.mkdir('workspace')
+            if not os.path.isdir('workspace/data_dst'): os.mkdir('workspace/data_dst')
+            if not os.path.isdir('workspace/data_src'): os.mkdir('workspace/data_src')
+            if not os.path.isdir('workspace/model'): os.mkdir('workspace/model')
                 
             
             q.put('#ID-' + convert_id)
@@ -484,7 +482,7 @@ def Main(q, labelsdict, run, option_id):
             
                 source_files_merge = concatenate_videoclips(src_vids_clip)
 
-                source_files_merge.write_videofile('/content/workspace/data_src.mp4') 
+                source_files_merge.write_videofile('workspace/data_src.mp4') 
                 
             except:
             
@@ -499,7 +497,7 @@ def Main(q, labelsdict, run, option_id):
 
                 target_files_merge = concatenate_videoclips(tar_vids_clip)
 
-                target_files_merge.write_videofile('/content/workspace/data_dst.mp4') 
+                target_files_merge.write_videofile('workspace/data_dst.mp4') 
                 
             except:
             
@@ -510,8 +508,8 @@ def Main(q, labelsdict, run, option_id):
           
             q.put  ('[4/7] Extracting frames ')
             
-            p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
-                subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
+            p = [subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py videoed extract-video --input-file workspace/data_src.* --output-dir workspace/data_src/ ", shell=True),
+                subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py videoed extract-video --input-file workspace/data_dst.* --output-dir workspace/data_dst/", shell=True)]
 
             p_ = [p[0].wait(), p[1].wait()]
             
@@ -525,8 +523,8 @@ def Main(q, labelsdict, run, option_id):
                 
             q.put  ('[5/7] Extracting faces ')
             
-            p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
-                subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
+            p = [subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py extract --input-dir workspace/data_src --output-dir workspace/data_src/aligned --detector s3fd", shell=True),
+                subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py extract --input-dir workspace/data_dst --output-dir workspace/data_dst/aligned --detector s3fd", shell=True)]
 
             p_ = [p[0].wait(), p[1].wait()]
             
@@ -556,12 +554,12 @@ def Main(q, labelsdict, run, option_id):
                 
                     break
 
-            os.system('Library/bin/python /content/DeepFaceLab/preview.py')
+            os.system('Library/bin/python DeepFaceLab/preview.py')
             
             #q.put  ('Enhancing Faces ')
             
-            #p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_src/aligned", shell=True),
-            #    subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_dst/aligned", shell=True)]
+            #p = [subprocess.Popen("echo | python DeepFaceLab/main.py facesettool enhance --input-dir workspace/data_src/aligned", shell=True),
+            #    subprocess.Popen("echo | python DeepFaceLab/main.py facesettool enhance --input-dir workspace/data_dst/aligned", shell=True)]
 
             #p_ = [p[0].wait(), p[1].wait()]
             
@@ -634,11 +632,11 @@ def Main(q, labelsdict, run, option_id):
         q.put('#ID-' + convert_id)
             
             
-        if len(os.listdir('/content/workspace/model/'))>1:
+        if len(os.listdir('workspace/model/'))>1:
                             
             #q.put('Removing any saved models')
         
-            #if os.path.isdir('/content/workspace/model'): shutil.rmtree('/content/workspace/model') 
+            #if os.path.isdir('workspace/model'): shutil.rmtree('workspace/model') 
             
             
             
@@ -677,7 +675,7 @@ def Main(q, labelsdict, run, option_id):
             
         else:
         
-            if os.path.isfile('/content/workspace/data_dst.mp4') and os.path.isfile('/content/workspace/data_src.mp4'):
+            if os.path.isfile('workspace/data_dst.mp4') and os.path.isfile('workspace/data_src.mp4'):
             
                 q.put('[1/5] Loading Workspace')
                 
@@ -686,8 +684,8 @@ def Main(q, labelsdict, run, option_id):
 
                 q.put  ('[2/5] Extracting frames ')
             
-                p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
-                    subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
+                p = [subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py videoed extract-video --input-file workspace/data_src.* --output-dir workspace/data_src/ ", shell=True),
+                    subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py videoed extract-video --input-file workspace/data_dst.* --output-dir workspace/data_dst/", shell=True)]
 
                 p_ = [p[0].wait(), p[1].wait()]
                 
@@ -701,8 +699,8 @@ def Main(q, labelsdict, run, option_id):
                     
                 q.put  ('[3/5] Extracting faces ')
                 
-                p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
-                    subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
+                p = [subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py extract --input-dir workspace/data_src --output-dir workspace/data_src/aligned --detector s3fd", shell=True),
+                    subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py extract --input-dir workspace/data_dst --output-dir workspace/data_dst/aligned --detector s3fd", shell=True)]
 
                 p_ = [p[0].wait(), p[1].wait()]
                 
@@ -733,11 +731,11 @@ def Main(q, labelsdict, run, option_id):
                         break
 
                 
-                os.system('Library/bin/python /content/DeepFaceLab/preview.py')
+                os.system('Library/bin/python DeepFaceLab/preview.py')
                 #q.put  ('Enhancing Faces ')
             
-                #p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_src/aligned", shell=True),
-                #    subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_dst/aligned", shell=True)]
+                #p = [subprocess.Popen("echo | python DeepFaceLab/main.py facesettool enhance --input-dir workspace/data_src/aligned", shell=True),
+                #    subprocess.Popen("echo | python DeepFaceLab/main.py facesettool enhance --input-dir workspace/data_dst/aligned", shell=True)]
 
                 #p_ = [p[0].wait(), p[1].wait()]
                 
@@ -793,14 +791,14 @@ def Main(q, labelsdict, run, option_id):
                 
                 
                 
-                    if os.path.isdir('/content/workspace/'):
+                    if os.path.isdir('workspace/'):
                     
-                        shutil.rmtree('/content/workspace/')
+                        shutil.rmtree('workspace/')
 
-                    if not os.path.isdir('/content/workspace'): os.mkdir('/content/workspace')
-                    if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
-                    if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
-                    if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
+                    if not os.path.isdir('workspace'): os.mkdir('workspace')
+                    if not os.path.isdir('workspace/data_dst'): os.mkdir('workspace/data_dst')
+                    if not os.path.isdir('workspace/data_src'): os.mkdir('workspace/data_src')
+                    if not os.path.isdir('workspace/model'): os.mkdir('workspace/model')
                 
                     model_name = 'workspace_'+convert_id + '.zip'
         
@@ -815,7 +813,7 @@ def Main(q, labelsdict, run, option_id):
                     
                         source_files_merge = concatenate_videoclips(src_vids_clip)
 
-                        source_files_merge.write_videofile('/content/workspace/data_src.mp4') 
+                        source_files_merge.write_videofile('workspace/data_src.mp4') 
                         
                     except:
                     
@@ -830,7 +828,7 @@ def Main(q, labelsdict, run, option_id):
 
                         target_files_merge = concatenate_videoclips(tar_vids_clip)
 
-                        target_files_merge.write_videofile('/content/workspace/data_dst.mp4') 
+                        target_files_merge.write_videofile('workspace/data_dst.mp4') 
                         
                     except:
                     
@@ -841,8 +839,8 @@ def Main(q, labelsdict, run, option_id):
                     
                     q.put  ('[4/7] Extracting frames ')
             
-                    p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_src.* --output-dir /content/workspace/data_src/ ", shell=True),
-                        subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py videoed extract-video --input-file /content/workspace/data_dst.* --output-dir /content/workspace/data_dst/", shell=True)]
+                    p = [subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py videoed extract-video --input-file workspace/data_src.* --output-dir workspace/data_src/ ", shell=True),
+                        subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py videoed extract-video --input-file workspace/data_dst.* --output-dir workspace/data_dst/", shell=True)]
 
                     p_ = [p[0].wait(), p[1].wait()]
                     
@@ -856,8 +854,8 @@ def Main(q, labelsdict, run, option_id):
                         
                     q.put  ('[5/7] Extracting faces ')
                     
-                    p = [subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_src --output-dir /content/workspace/data_src/aligned --detector s3fd", shell=True),
-                        subprocess.Popen("echo | Library/bin/python /content/DeepFaceLab/main.py extract --input-dir /content/workspace/data_dst --output-dir /content/workspace/data_dst/aligned --detector s3fd", shell=True)]
+                    p = [subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py extract --input-dir workspace/data_src --output-dir workspace/data_src/aligned --detector s3fd", shell=True),
+                        subprocess.Popen("echo | Library/bin/python DeepFaceLab/main.py extract --input-dir workspace/data_dst --output-dir workspace/data_dst/aligned --detector s3fd", shell=True)]
 
                     p_ = [p[0].wait(), p[1].wait()]
                     
@@ -887,12 +885,12 @@ def Main(q, labelsdict, run, option_id):
                         
                             break
 
-                    os.system('Library/bin/python /content/DeepFaceLab/preview.py')
+                    os.system('Library/bin/python DeepFaceLab/preview.py')
                     
                     #q.put  ('Enhancing Faces ')
             
-                    #p = [subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_src/aligned", shell=True),
-                    #    subprocess.Popen("echo | python /content/DeepFaceLab/main.py facesettool enhance --input-dir /content/workspace/data_dst/aligned", shell=True)]
+                    #p = [subprocess.Popen("echo | python DeepFaceLab/main.py facesettool enhance --input-dir workspace/data_src/aligned", shell=True),
+                    #    subprocess.Popen("echo | python DeepFaceLab/main.py facesettool enhance --input-dir workspace/data_dst/aligned", shell=True)]
 
                     #p_ = [p[0].wait(), p[1].wait()]
                     
@@ -901,7 +899,7 @@ def Main(q, labelsdict, run, option_id):
                     #    return False    
                     
                                     
-                    os.system('Library/bin/python /content/DeepFaceLab/preview.py')
+                    os.system('Library/bin/python DeepFaceLab/preview.py')
                     q.put  ('[7/7] Extracting face masks ')
                     
                     p = os.system('Library/bin/python face_seg.py')
@@ -966,7 +964,7 @@ def Main(q, labelsdict, run, option_id):
         
         model_name = 'workspace_'+convert_id + '.zip'
 
-        if os.path.isfile('/content/workspace/data_dst.mp4') and os.path.isfile('/content/workspace/data_src.mp4'):
+        if os.path.isfile('workspace/data_dst.mp4') and os.path.isfile('workspace/data_src.mp4'):
         
             q.put('[1/2] Downlaoding Model' )
     
@@ -977,9 +975,9 @@ def Main(q, labelsdict, run, option_id):
 
             for file in archive.namelist():
                 if file.startswith('workspace/model/'):
-                    archive.extract(file, '/content/')
+                    archive.extract(file, '')
                     
-            os.system('Library/bin/python /content/DeepFaceLab/preview.py')
+            os.system('Library/bin/python DeepFaceLab/preview.py')
                     
             
             q.put('[2/2] Loading Workspace')
@@ -1020,13 +1018,13 @@ def Main(q, labelsdict, run, option_id):
         else:
         
         
-            if os.path.isdir('/content/workspace/'):
-                shutil.rmtree('/content/workspace/')
+            if os.path.isdir('workspace/'):
+                shutil.rmtree('workspace/')
 
-            if not os.path.isdir('/content/workspace'): os.mkdir('/content/workspace')
-            if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
-            if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
-            if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
+            if not os.path.isdir('workspace'): os.mkdir('workspace')
+            if not os.path.isdir('workspace/data_dst'): os.mkdir('workspace/data_dst')
+            if not os.path.isdir('workspace/data_src'): os.mkdir('workspace/data_src')
+            if not os.path.isdir('workspace/model'): os.mkdir('workspace/model')
             
             q.put('[1/2] Downlaoding Workspace')
             import zipfile
@@ -1041,9 +1039,9 @@ def Main(q, labelsdict, run, option_id):
                 extracted_size += file.file_size
                 zf.extract(file)
                 
-            #os.system('echo A | unzip /content/drive/My\ Drive/'+model_name)
+            #os.system('echo A | unzip drive/My\ Drive/'+model_name)
             
-            os.system('Library/bin/python /content/DeepFaceLab/preview.py')
+            os.system('Library/bin/python DeepFaceLab/preview.py')
             
             q.put('[2/2] Loading Workspace')
             
@@ -1216,7 +1214,7 @@ Progress =  html.Div([dbc.InputGroup(
 #html.Hr(id = 'hr3'), html.Div(id = 'progress_field')]
 
 try:
-    url=os.path.join('/assets', glob.glob("/content/assets/*mp4")[0].split('/')[-1])
+    url=os.path.join('/assets', glob.glob("assets/*mp4")[0].split('/')[-1])
 except:
     url = ''
 Preview_vid = html.Div([dash_player.DashPlayer(
@@ -1558,7 +1556,7 @@ Settings = loading(html.Div([ dbc.Button(outline=True, id = 'save_settings_file'
     ),dbc.Tooltip('Save', target="save_settings_file"),
 ]))
 try:
-    sec_s = ' [Updated ' +str(int(time.time() - os.path.getctime(glob.glob("/content/assets/*mp4")[0]))//60)  + ' minutes ago]'
+    sec_s = ' [Updated ' +str(int(time.time() - os.path.getctime(glob.glob("assets/*mp4")[0]))//60)  + ' minutes ago]'
     
     
 except:
@@ -2150,13 +2148,13 @@ def update_details(t1, t2, n, n1, s2, s3, s4):
 
         i.terminate() 
             
-        #if os.path.isdir('/content/workspace/'):
-        #    shutil.rmtree('/content/workspace/')
+        #if os.path.isdir('workspace/'):
+        #    shutil.rmtree('workspace/')
 
-        #if not os.path.isdir('/content/workspace'): os.mkdir('/content/workspace')
-        #if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
-        #if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
-        #if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
+        #if not os.path.isdir('workspace'): os.mkdir('workspace')
+        #if not os.path.isdir('workspace/data_dst'): os.mkdir('workspace/data_dst')
+        #if not os.path.isdir('workspace/data_src'): os.mkdir('workspace/data_src')
+        #if not os.path.isdir('workspace/model'): os.mkdir('workspace/model')
             
     #threading.Thread(target=resetall, args=(), daemon=True).start()
     
@@ -2898,7 +2896,7 @@ def open_toast2(is_open):
 
 def update_settings(n, text):
 
-    with open('/content/DeepFaceLab/settings.py', 'w') as f:
+    with open('DeepFaceLab/settings.py', 'w') as f:
     
         f.write(text)
         
@@ -2933,19 +2931,19 @@ def update_images(ints,kd):
 
             i.terminate() 
                 
-        if os.path.isdir('/content/workspace/'):
-            shutil.rmtree('/content/workspace/')
+        if os.path.isdir('workspace/'):
+            shutil.rmtree('workspace/')
             
         
-        if os.path.isdir('/content/assets'):
-            shutil.rmtree('/content/assets')
+        if os.path.isdir('assets'):
+            shutil.rmtree('assets')
         
         
-        if not os.path.isdir('/content/workspace'): os.mkdir('/content/workspace')
-        if not os.path.isdir('/content/workspace/data_dst'): os.mkdir('/content/workspace/data_dst')
-        if not os.path.isdir('/content/workspace/data_src'): os.mkdir('/content/workspace/data_src')
-        if not os.path.isdir('/content/workspace/model'): os.mkdir('/content/workspace/model')
-        if not os.path.isdir('/content/assets'): os.mkdir('/content/assets')
+        if not os.path.isdir('workspace'): os.mkdir('workspace')
+        if not os.path.isdir('workspace/data_dst'): os.mkdir('workspace/data_dst')
+        if not os.path.isdir('workspace/data_src'): os.mkdir('workspace/data_src')
+        if not os.path.isdir('workspace/model'): os.mkdir('workspace/model')
+        if not os.path.isdir('assets'): os.mkdir('assets')
         
         [os.remove(os.path.join('/tmp',i)) for i in os.listdir('/tmp') if i.endswith('.npy')]
 
@@ -2971,8 +2969,8 @@ def update_images(ints,kd):
         
         if len(jpgs)>1:
             
-            img1 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD.jpg')
-            img2 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
+            img1 = cv2.imread('workspace/model/new_SAEHD_preview_SAEHD.jpg')
+            img2 = cv2.imread('workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
             img3 = np.concatenate([img1[100:356, 2*256:3*256], img2[100:356, 2*256:3*256], img2[100:356, 4*256:5*256], img1[100:356, 4*256:5*256]],1)
             img3 = imutils.resize(img3, height = 128)
             
@@ -2981,16 +2979,16 @@ def update_images(ints,kd):
             
             ret, img3 = cv2.imencode('.jpg', img3)
             
-            #p = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
-            #p1 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD.jpg')
+            #p = cv2.imread('workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
+            #p1 = cv2.imread('workspace/model/new_SAEHD_preview_SAEHD.jpg')
             img3 = base64.b64encode(img3)
             src3 = 'data:image/jpg;base64,{}'.format(img3.decode())
             
             img4 = cv2.resize(255 - img1[:100], (1280,350))
             ret, img4 = cv2.imencode('.jpg', img4)
             
-            #p = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
-            #p1 = cv2.imread('/content/workspace/model/new_SAEHD_preview_SAEHD.jpg')
+            #p = cv2.imread('workspace/model/new_SAEHD_preview_SAEHD masked.jpg')
+            #p1 = cv2.imread('workspace/model/new_SAEHD_preview_SAEHD.jpg')
             img4 = base64.b64encode(img4)
             src4 = 'data:image/jpg;base64,{}'.format(img4.decode())
             
@@ -3044,7 +3042,7 @@ def open_toast1(n,dlld):
     ##print'######################################################')
     #########print (dash.callback_context.triggered[0]['prop_id'], currentframe().f_lineno)
     ##print'######################################################')
-    if len(glob.glob('/content/assets/*mp4'))>0:
+    if len(glob.glob('assets/*mp4'))>0:
         return True
         
     else:
@@ -3135,28 +3133,28 @@ def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, dddw,t1, model_name
   
       if s1 == "0":
       
-        with open('/content/DeepFaceLab/settings.py', 'a') as f:
+        with open('DeepFaceLab/settings.py', 'a') as f:
 
             f.write("\nFace_Type = 'head'" + "\n")
             f.close()
             
       elif s1 == "1":
       
-        with open('/content/DeepFaceLab/settings.py', 'a') as f:
+        with open('DeepFaceLab/settings.py', 'a') as f:
 
             f.write("\nFace_Type = 'wf'" + "\n")
             f.close()
             
       elif  s1 == "2":
       
-        with open('/content/DeepFaceLab/settings.py', 'a') as f:
+        with open('DeepFaceLab/settings.py', 'a') as f:
 
             f.write("\nFace_Type = 'f'" + "\n")
             f.close()    
       
       else:
         
-        with open('/content/DeepFaceLab/settings.py', 'a') as f:
+        with open('DeepFaceLab/settings.py', 'a') as f:
 
             f.write("\nFace_Type = 'f'" + "\n")
             f.close()
@@ -3358,7 +3356,7 @@ def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, dddw,t1, model_name
             
             
             try:
-                iters = str(open('/content/workspace/model/iteration.txt','r').read())
+                iters = str(open('workspace/model/iteration.txt','r').read())
                 
                 itt = '['+iters + '] '
                 
@@ -3394,8 +3392,18 @@ def update_start(n, intval,confirm_delete, aadss, fkdk,lsls, dddw,t1, model_name
             #return [status_children, Progress_header, start_text_continue_disabled, start_text_input_disabled, face_type_select_disabled, modal_error_details, modal_error_is_open, interval_interval, open_choose_box, cols]
          
  
+      if message:
         
-        
+        if message.startswith(':Stopped:'):
+            
+            start_text_continue_disabled = False
+            start_text_input_disabled = False
+            face_type_select_disabled =False
+            threadon = True
+            threadon_ = True
+            no_loop = False
+            Progress_header = 'Choose an option'
+            status_children = 'Start the Process'
         
       
       
@@ -3458,7 +3466,7 @@ def update(cvt,eioji):
         convert_id = f.read()
         f.close()
         
-        prev_zip_name = '/content/workspace_'+convert_id+'.zip'
+        prev_zip_name = 'workspace_'+convert_id+'.zip'
         
         
         prev_zip_name_ = os.path.join(drive_path,'workspace_'+convert_id+'.zip')
@@ -3468,7 +3476,7 @@ def update(cvt,eioji):
         f.write(convert_id)
         f.close()
         
-        new_zip_name = '/content/workspace_'+convert_id+'.zip'
+        new_zip_name = 'workspace_'+convert_id+'.zip'
         
         new_zip_name_ = os.path.join(drive_path,'workspace_'+convert_id+'.zip')
         
@@ -3779,7 +3787,7 @@ def update_convert_image(v_plus_size,h_minus_size, h_plus_size, v_minus_size , v
             
             dict_2 = {0: 'None', 1:'rct',2:'lct',3:'mkl',4:'mkl-m',5:'idt',6:'idt-m',7:'sot-m',8:'mix-m'}
             
-            with open('/content/DeepFaceLab/settings.py', 'a') as f:
+            with open('DeepFaceLab/settings.py', 'a') as f:
 
                 f.write("\nmerging_mode = "+ str(dict_1[cfg_merge.mode]))
                 f.write("\nmask_merging_mode = " + str(cfg_merge.mask_mode))
@@ -3839,15 +3847,15 @@ def update__(interval):
     
         #print ('f')
 
-        number_of_files = len(os.listdir('/content/workspace/preview/merged'))
-        total_number_of_files = len(os.listdir('/content/workspace/preview/')) - 3
+        number_of_files = len(os.listdir('workspace/preview/merged'))
+        total_number_of_files = len(os.listdir('workspace/preview/')) - 3
         
         done =  int((number_of_files/total_number_of_files)*100)
         #print (done)
         
         
         try:
-            secss = time.time() - os.path.getctime(glob.glob("/content/assets/*mp4")[0])
+            secss = time.time() - os.path.getctime(glob.glob("assets/*mp4")[0])
             sec_s = ' [Updated ' +str(int(secss)//60)  + ' minutes ago]'
         
             
@@ -3856,12 +3864,12 @@ def update__(interval):
         
         try:
         
-            #print (time.time() - os.path.getctime(glob.glob("/content/assets/*mp4")[0]))
+            #print (time.time() - os.path.getctime(glob.glob("assets/*mp4")[0]))
             if secss <=20:
             
                 #print ('updates')
                 
-                return [done, os.path.join('/assets', glob.glob("/content/assets/*mp4")[0].split('/')[-1]),sec_s]
+                return [done, os.path.join('/assets', glob.glob("assets/*mp4")[0].split('/')[-1]),sec_s]
             
             else:
                 return [done, dash.no_update,sec_s]
@@ -3896,16 +3904,16 @@ def update__(n, interval):
     
         killall()
     
-        if os.path.isdir('/content/workspace/data_dst/merged'):
-            shutil.rmtree('/content/workspace/data_dst/merged')
-            os.mkdir ('/content/workspace/data_dst/merged')
+        if os.path.isdir('workspace/data_dst/merged'):
+            shutil.rmtree('workspace/data_dst/merged')
+            os.mkdir ('workspace/data_dst/merged')
             
             
         dict_1 = {'original':0, 'overlay':1, 'hist-match':2 ,'seamless':3 ,'seamless-hist-match':4 , 'raw-rgb':5 , 'raw-predict':6}
         
         dict_2 = {0: 'None', 1:'rct',2:'lct',3:'mkl',4:'mkl-m',5:'idt',6:'idt-m',7:'sot-m',8:'mix-m'}
         
-        with open('/content/DeepFaceLab/settings.py', 'a') as f:
+        with open('DeepFaceLab/settings.py', 'a') as f:
 
             f.write("\nmerging_mode = "+ str(dict_1[cfg_merge.mode]))
             f.write("\nmask_merging_mode = " + str(cfg_merge.mask_mode))
@@ -3949,8 +3957,8 @@ def update__(n, interval):
     
     if n and trigger_id=='interval-1.n_intervals':
         
-        number_of_files = len(os.listdir('/content/workspace/data_dst/merged'))
-        total_number_of_files = len(os.listdir('/content/workspace/data_dst/'))-2 
+        number_of_files = len(os.listdir('workspace/data_dst/merged'))
+        total_number_of_files = len(os.listdir('workspace/data_dst/'))-2 
         
         done =  int((number_of_files/total_number_of_files)*100)
         
