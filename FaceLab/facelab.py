@@ -13,14 +13,14 @@ parser.add_argument('ngrok_auth_token', type=str, nargs='?',
 parser.add_argument('--path', type=str,
                     help='Specify drive path')
                     
-parser.add_argument('--no_output', action='store_true',
+parser.add_argument('--debug', action='store_true',
                     help='the shell output will be disabled')
 
 args = parser.parse_args()
 
 xxx = args.ngrok_auth_token
 drive_path = args.path
-no_output_ = args.no_output
+debug = args.debug
 
 
 fakelab_ = """
@@ -120,14 +120,14 @@ get_ipython().system_raw("fuser -k 8000/tcp")
 
 if drive_path:
 
-    if no_output_:
+    if not debug:
       get_ipython().system_raw("Library/bin/python app.py "+drive_path)
     else:
       G = get_ipython().getoutput("Library/bin/python app.py "+drive_path)
       
 else:
 
-    if no_output_:
+    if not debug:
       get_ipython().system_raw("Library/bin/python app.py")
     else:
       G = get_ipython().getoutput("Library/bin/python app.py")

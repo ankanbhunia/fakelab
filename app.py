@@ -409,8 +409,8 @@ def get_preview():
             os.system('rm -r workspace/preview/merged')
             os.mkdir('workspace/preview/merged')
         
-            os.system("printf '0\nCPU\n' | Library/bin/python DeepFaceLab/main.py merge --input-dir workspace/preview --output-dir workspace/preview/merged --output-mask-dir workspace/preview/merged_mask --aligned-dir workspace/preview/aligned --model-dir workspace/model --model SAEHD")
-            os.system("printf '10\n' | Library/bin/python DeepFaceLab/main.py videoed video-from-sequence_  --input-dir workspace/preview/merged --output-file workspace/result_preview.mp4")
+            os.system("printf '0\nCPU\n' | Library/bin/python DeepFaceLab/main.py merge --input-dir workspace/preview --output-dir workspace/preview/merged --output-mask-dir workspace/preview/merged_mask --aligned-dir workspace/preview/aligned --model-dir workspace/model --model SAEHD > /dev/null 2>&1")
+            os.system("printf '10\n' | Library/bin/python DeepFaceLab/main.py videoed video-from-sequence_  --input-dir workspace/preview/merged --output-file workspace/result_preview.mp4 > /dev/null 2>&1")
             
             import moviepy.editor as mp
 
@@ -1034,7 +1034,7 @@ def Main(q, labelsdict, run, option_id):
             
             q.put('[1/2] Downlaoding Workspace')
             import zipfile
-            print ('Extracting files... ')
+            print ('[1/1] Extracting files ')
             zf = zipfile.ZipFile(os.path.join(drive_path_,model_name))
 
             uncompress_size = sum((file.file_size for file in zf.infolist()))
