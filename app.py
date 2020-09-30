@@ -362,6 +362,9 @@ def Convert():
     os.system('echo | Library/bin/python DeepFaceLab/main.py merge --input-dir workspace/data_dst --output-dir workspace/data_dst/merged --output-mask-dir workspace/data_dst/merged_mask --aligned-dir workspace/data_dst/aligned --model-dir workspace/model --model SAEHD')
     os.system('echo | Library/bin/python DeepFaceLab/main.py videoed video-from-sequence --input-dir workspace/data_dst/merged --output-file workspace/'+output_name+' --reference-file workspace/data_dst.mp4 --include-audio')
     os.system('cp workspace/'+output_name+' '+drive_path)
+    
+    
+    os.system('rm -r /tmp/*npy')
     # need to install xattr
     
     ##########print ('###############################' + 'convertion done')
@@ -972,7 +975,7 @@ def Main(q, labelsdict, run, option_id):
             q.put('[1/2] Downlaoding Model' )
     
             import zipfile
-            print ('Extracting files... ')
+            print ('[1/1] Extracting files ')
 
             archive = zipfile.ZipFile(os.path.join(drive_path_,model_name))
 
