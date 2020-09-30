@@ -99,7 +99,8 @@ if argss.drivepath == None:
 drive_path_ = argss.drivepath
 drive_path = '\ '.join(drive_path_.split(' '))
 
-
+global show_mode
+show_mode = 1
 
 def killall():
     os.system('sudo fuser -k /dev/nvidia-uvm')
@@ -110,7 +111,7 @@ killall()
 class merging_vars:
 
   def __init__(self, 
-                face_type = None,
+                #face_type = None,
                 output_face_scale = 0,
                 super_resolution_power = 0,
                 mask_mode = 3,
@@ -129,10 +130,11 @@ class merging_vars:
                 horizontal_shear = 0,
                 vertical_shear = 0,
                 horizontal_shift = 0,
-                vertical_shift = 0
+                vertical_shift = 0,
+                show_mode = 1
                 ):
 
-    self.face_type = face_type
+    #self.face_type = face_type
     self.output_face_scale = output_face_scale
     self.super_resolution_power = super_resolution_power
     self.mask_mode = mask_mode
@@ -152,6 +154,7 @@ class merging_vars:
     self.vertical_shear = vertical_shear
     self.horizontal_shift = horizontal_shift
     self.vertical_shift = vertical_shift
+    self.show_mode = show_mode
 
 #[os.remove(os.path.join('/tmp',i)) for i in os.listdir('/tmp') if i.endswith('.npy')]
 
@@ -357,7 +360,7 @@ def Convert():
     if not os.path.isdir('workspace/data_dst/merged_mask'): os.mkdir('workspace/data_dst/merged_mask')
 
     os.system('echo | Library/bin/python DeepFaceLab/main.py merge --input-dir workspace/data_dst --output-dir workspace/data_dst/merged --output-mask-dir workspace/data_dst/merged_mask --aligned-dir workspace/data_dst/aligned --model-dir workspace/model --model SAEHD')
-    os.system('echo | Library/bin/python DeepFaceLab/main.py videoed video-from-sequence_ --input-dir workspace/data_dst/merged --output-file workspace/'+output_name+' --reference-file workspace/data_dst.mp4 --include-audio')
+    os.system('echo | Library/bin/python DeepFaceLab/main.py videoed video-from-sequence --input-dir workspace/data_dst/merged --output-file workspace/'+output_name+' --reference-file workspace/data_dst.mp4 --include-audio')
     os.system('cp workspace/'+output_name+' '+drive_path)
     # need to install xattr
     
@@ -411,8 +414,8 @@ def get_preview():
             if not os.path.isdir('assets'): os.mkdir('assets')
             
             if os.path.isfile("workspace/result_preview.mp4"):
-                clip = mp.VideoFileClip("workspace/result_preview.mp4")
-                clip_resized = clip.resize(height=360) # make the height 360px ( According to moviePy documenation The width is then computed so that the width/height ratio is conserved.)
+                clip_resized = mp.VideoFileClip("workspace/result_preview.mp4")
+                #clip_resized = clip.resize(height=360) # make the height 360px ( According to moviePy documenation The width is then computed so that the width/height ratio is conserved.)
                 convert_id_ = (''.join(map(choice,["bcdfghjklmnpqrstvwxz","aeiouy"]*3)))
                 [os.remove(i) for i in glob.glob("assets/*mp4")]
                 
@@ -1295,12 +1298,9 @@ shift_layout = dbc.Card(
 
 basic_Set = [ html.Br(),
 
-dbc.Row([dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Face type", addon_type="prepend"),dbc.Select(id = 'face_type_', options = [{'label':'Head', "value" :0},
-{'label':'Face', "value" :1}, 
-{'label':'Full Face', "value" :2}, 
-], value = '2')], size="sm"),),
 
-dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Mask type", addon_type="prepend"),dbc.Select(id = 'mask_mode_', options = [{'label':'dst', "value" :1},
+
+dbc.Row([dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Mask type", addon_type="prepend"),dbc.Select(id = 'mask_mode_', options = [{'label':'dst', "value" :1},
 {'label':'learned-prd', "value" :2}, 
 {'label':'learned-dst', "value" :3}, 
 {'label':'learned-prd*learned-dst', "value" :4}, 
@@ -1308,9 +1308,9 @@ dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Mask type", addon_type="prepend"),d
 {'label':'XSeg-prd', "value" :6}, 
 {'label':'XSeg-dst', "value" :7},  
 {'label':'XSeg-prd*XSeg-dst', "value" :8}, 
-{'label':'learned-prd*learned-dst*XSeg-prd*XSeg-dst', "value" :9}], value = 3),], size="sm",))], justify = 'center',  no_gutters=True,),
+{'label':'learned-prd*learned-dst*XSeg-prd*XSeg-dst', "value" :9}], value = 3),], size="sm",)), 
 
-dbc.Row([dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Mode", addon_type="prepend"),dbc.Select(id = 'mode_', options = [{'label':'original', "value" :'original'},
+dbc.Col(dbc.InputGroup([dbc.InputGroupAddon("Mode", addon_type="prepend"),dbc.Select(id = 'mode_', options = [{'label':'original', "value" :'original'},
 {'label':'overlay', "value" :'overlay'}, 
 {'label':'hist-match', "value" :'hist-match'}, 
 {'label':'seamless', "value" :'seamless'}, 
@@ -1406,10 +1406,18 @@ Convert_Tab =  html.Div([dbc.Card(
       
       loading([html.Div(dbc.ButtonGroup(
             [
+            
+            dbc.Button( id = 'default_pre', active=False, disabled = convert_disabled, color="light", size = 'sm', className="far fa-window-maximize"),
+                dbc.Button( id = 'ori_pre', active=False, disabled = convert_disabled, color="light", size = 'sm', className="fas fa-window-maximize"),
+                dbc.Button( id = 'default_face_pre', active=False, disabled = convert_disabled, color="light", size = 'sm', className="fas fa-smile-beam"),
+                dbc.Button( id = 'ori_face_pre', active=False, disabled = convert_disabled, color="light", size = 'sm', className="far fa-smile-beam"),
+                
             dbc.Button( id = 'refresh_img', active=False, disabled = convert_disabled, color="light", size = 'sm', className="fas fa-redo"),
             
 
-                dbc.Button( id = 'okay_merge', active=False, disabled = convert_disabled, color="light", size = 'sm', className="fas fa-sign-in-alt")]),
+                dbc.Button( id = 'okay_merge', active=False, disabled = convert_disabled, color="light", size = 'sm', className="fas fa-sign-in-alt"),
+                
+                ]),
                 style = {'text-align':'center', 'margin-bottom':'-23px'}) ,
         
         dbc.CardImg(top=True, id = 'Convert_Image'),
@@ -1469,6 +1477,10 @@ Convert_Tab =  html.Div([dbc.Card(
             dbc.Tooltip('Refresh Image', target="refresh_img"),
             dbc.Tooltip('Save Settings', target="okay_merge"),
             
+            dbc.Tooltip('Resultant frame', target="default_pre"),
+            dbc.Tooltip('Original frame', target="ori_pre"),
+            dbc.Tooltip('Resultant face', target="default_face_pre"),
+            dbc.Tooltip('Original face', target="ori_face_pre"),
             
         ],
         
@@ -3657,7 +3669,7 @@ def update(n):
                 Input('refresh_img', 'n_clicks'),
             
                 Input('mask_mode_', 'value'),
-                Input('face_type_', 'value'),
+                #Input('face_type_', 'value'),
                 Input('mode_', 'value'),
                 
                 Input('Erode_', 'value'),
@@ -3667,14 +3679,19 @@ def update(n):
                 Input('blursharpen_amount_', 'value'),
                 Input('image_denoise_power_', 'value'),
                 Input('color_degrade_power_', 'value'),
-                Input('okay_merge', 'n_clicks'), Input('convert_tabs_1', 'active_tab')
+                Input('okay_merge', 'n_clicks'), 
+                Input('convert_tabs_1', 'active_tab'),
+                Input('default_pre', 'n_clicks'),
+                Input('ori_pre', 'n_clicks'),
+                Input('default_face_pre', 'n_clicks'),
+                Input('ori_face_pre', 'n_clicks'),
         ],# [State('size_step', 'value'),
           #   State('shift_step', 'value')]
                 )    
                 
 def update_convert_image(v_plus_size,h_minus_size, h_plus_size, v_minus_size , v_plus_shift, h_minus_shift, h_plus_shift, v_minus_shift, refresh_img,
-                          mask_mode_, face_type_, mode_, Erode_,Blur_ ,color_mode_, motion_blur_power_, blursharpen_amount_,
-                        image_denoise_power_,color_degrade_power_,okay_merge, jdkd):
+                          mask_mode_, mode_, Erode_,Blur_ ,color_mode_, motion_blur_power_, blursharpen_amount_,
+                        image_denoise_power_,color_degrade_power_,okay_merge, jdkd, default_pre, ori_pre,default_face_pre,  ori_face_pre):
 
     
     trigger_id = dash.callback_context.triggered[0]['prop_id']
@@ -3689,6 +3706,9 @@ def update_convert_image(v_plus_size,h_minus_size, h_plus_size, v_minus_size , v
     global ind_preview
     global npy_files
     global cfg_merge
+    global show_mode
+    
+    
     
     if trigger_id == 'v_plus_size.n_clicks':
     
@@ -3735,19 +3755,7 @@ def update_convert_image(v_plus_size,h_minus_size, h_plus_size, v_minus_size , v
     
     
     
-    
-    if int(face_type_) == 0:
-    
-        face_type = FaceType.HEAD
-        
-    elif int(face_type_) == 1:
-    
-        face_type = FaceType.FULL
-    
-    elif int(face_type_) == 2:
-    
-        face_type = FaceType.WHOLE_FACE
-        
+
     try:
 
         npy_ = os.path.join('/tmp', npy_files[ind_preview])
@@ -3755,8 +3763,25 @@ def update_convert_image(v_plus_size,h_minus_size, h_plus_size, v_minus_size , v
         
         ##########print (npy_)
         
+        
+        if trigger_id == 'default_pre.n_clicks':
+            show_mode = 1
+        
+        if trigger_id == 'ori_pre.n_clicks':
+            show_mode = 2
+        
+        if trigger_id == 'default_face_pre.n_clicks':
+            
+            show_mode = 3
+        if trigger_id == 'ori_face_pre.n_clicks':
+            show_mode = 4
+        
+        
+      
+            
+        
         cfg_merge = merging_vars(
-                face_type = face_type,
+               # face_type = face_type,
                 mask_mode = int(mask_mode_),
                 mode = mode_,
                 erode_mask_modifier = Erode_,
@@ -3773,11 +3798,16 @@ def update_convert_image(v_plus_size,h_minus_size, h_plus_size, v_minus_size , v
                 horizontal_shear = horizontal_shear,
                 vertical_shear = vertical_shear,
                 horizontal_shift = horizontal_shift,
-                vertical_shift = vertical_shift
+                vertical_shift = vertical_shift,
+                show_mode = show_mode
                 )
+        
+        
+        
+        
+        
                 
-                
-        result, _ = Merger_tune.MergeMaskedFace_test(npy_, cfg_merge)
+        result = Merger_tune.MergeMaskedFace_test(npy_, cfg_merge)
         
         #print (result.shape)
         
@@ -3819,7 +3849,7 @@ def update_convert_image(v_plus_size,h_minus_size, h_plus_size, v_minus_size , v
                 f.close()
             
         
-        result = imutils.resize(result*255, height=256)
+        result = imutils.resize(result*255, height=512)
         
         #########print (result.shape)
         
